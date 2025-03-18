@@ -20,6 +20,10 @@
 #define potTest1 36
 #define potTest2 39
 
+//pour les tests
+int cycle1;
+int cycle2;
+
 void signalPWM(int pin, int dutyCycle) {
     
     pinMode(pin, OUTPUT);

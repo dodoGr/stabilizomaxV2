@@ -22,8 +22,7 @@ int BDminmesure = 4095;
 int BDmaxmesure = 0;
 int ACminmesure = 4095;
 int ACmaxmesure = 0;
-/*
-*/
+
 int lireBD() {
     pinMode(BDpot, INPUT);
 

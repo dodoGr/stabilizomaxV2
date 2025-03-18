@@ -13,7 +13,6 @@
 #define XmaxPlateau 304
 #define YminPlateau 0
 #define YmaxPlateau 228
-#include "plateau.hpp"
 
 int Xmin = 3000;
 int Xmax = 0;

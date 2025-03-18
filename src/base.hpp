@@ -10,6 +10,6 @@
 // definition du tableau
 #define TAILLE_TAB 20 
 // definition du temps
-#define temps 10 //temps en ms
+#define temps 500 //temps en ms
 
 #endif // base_hpp
