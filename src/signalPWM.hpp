@@ -3,23 +3,6 @@
 
 #include "base.hpp"
 
-// Définition des broches ESP32 pour le signal PWM
-#define bobineA 15
-#define bobineB 2  //verifier les broches
-#define bobineC 0  //verifier les broches
-#define bobineD 4  //verifier les broches
-
-#define frequence 5000
-
-//calculés suivant le besoin
-#define rapportCycliqueA 250
-#define rapportCycliqueB 250
-#define rapportCycliqueC 200
-#define rapportCycliqueD 200
-
-#define potTest1 36
-#define potTest2 39
-
 //pour les tests
 int cycle1;
 int cycle2;
@@ -29,8 +12,6 @@ void signalPWM(int pin, int dutyCycle) {
     pinMode(pin, OUTPUT);
     analogWrite(pin, dutyCycle);
 }
-
-
 
 /*
 pinMode(potTest, INPUT);

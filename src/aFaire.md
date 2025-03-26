@@ -6,7 +6,7 @@
 On a besoin de :
 
 #### Plateau
-[Class Plateau](RecupDonnees.hpp)
+[Code Plateau](plateau.hpp)
 
 - [x] Initialisation des broches Xri, Xle, Yup, Ylo
 - [x] récupération des positions
@@ -14,7 +14,7 @@ On a besoin de :
 + [ ] faire un filtrage ?
 
 #### Potentiomètres
-[Class Potentiometre](RecupDonnees.hpp)
+[Code Potentiometre](potentiometre.hpp)
 
 - [x] Initialisation des broches BDpot, ACpot
 - [x] récupération des positions
@@ -43,7 +43,7 @@ On a besoin de :
 ### Sorties
 
 Signal PWM 
-[Class signalPWM](EnvoieDonnees.hpp)
+[Code signalPWM](signalPWM.hpp)
 - BobineA, BobineB, BobineC, BobineD
 
 ---
