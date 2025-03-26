@@ -2,9 +2,8 @@
 #define calcul_hpp
 
 #include "base.hpp"
-#include "plateau.hpp"
-#include "potentiometre.hpp"
 
+/*
 void vitesse(){
     int vitesseX = 0;
     int vitesseY = 0;
@@ -29,22 +28,23 @@ void vitesse(){
 void acceleration(){
     int accelerationX = 0;
     int accelerationY = 0;
-
+    
     accelerationX = (tabVitesseX[1] - tabVitesseX[0]);
     accelerationY = (tabVitesseY[1] - tabVitesseY[0]);
-
+    
     Serial.print("Acceleration X = ");
     Serial.println(accelerationX);
     Serial.print("\tAcceleration Y = ");
     Serial.println(accelerationY);
 }
+*/
 
 
 void test_equilibrage(){
 //( les bobines fonctionnent à l'inverse, de 0 à 255 en sachant que 0 est la valeur la plus importante et 255 la plus faible )
     
     //si le plateau penche vers la Bobine C alors : 
-    if(ACpot < 0){ 
+    if(ACpot > 0){ 
         //si le plateau descend
         if ((tabAC[0]-tabAC[1]) < 0){     
             //on veut redresser sur la bobine C donc on baisse la valeur de C (puissance +) et augmente celle de A (puissance -)
@@ -82,7 +82,7 @@ void test_equilibrage(){
 /////////////////////////////////////////////////////////
 
     //si le plateau penche vers la Bobine A alors : 
-    if(ACpot > 0){ 
+    if(ACpot < 0){ 
         //si le plateau descend
         if ((tabAC[0]-tabAC[1]) > 0){     
             //on veut redresser sur la bobine A donc on baisse la valeur de A (puissance +) et augmente celle de C (puissance -)
@@ -121,7 +121,7 @@ void test_equilibrage(){
 ////////////////////////////////////////////////////////////////////////////////
 
     //si le plateau penche vers la Bobine D alors : 
-    if(BDpot < 0){ 
+    if(BDpot > 0){ 
         //si le plateau descend
         if ((tabBD[0]-tabBD[1]) < 0){     
             //on veut redresser sur la bobine D donc on baisse la valeur de D (puissance +) et augmente celle de B (puissance -)
@@ -159,7 +159,7 @@ void test_equilibrage(){
 /////////////////////////////////////////////////////////
 
     //si le plateau penche vers la Bobine A alors : 
-    if(BDpot > 0){ 
+    if(BDpot < 0){ 
         //si le plateau descend
         if ((tabBD[0]-tabBD[1]) > 0){     
             //on veut redresser sur la bobine A donc on baisse la valeur de A (puissance +) et augmente celle de C (puissance -)

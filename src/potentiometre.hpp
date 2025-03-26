@@ -3,7 +3,6 @@
 
 #include "base.hpp"
 
-
 int lireBD() {
     pinMode(BDpot, INPUT);
 

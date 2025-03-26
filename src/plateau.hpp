@@ -3,7 +3,6 @@
 
 #include "base.hpp"
 
-
 int convertirX(int X) {
     return map(X, Xmin, Xmax, XminPlateau, XmaxPlateau);
 }

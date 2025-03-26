@@ -78,6 +78,7 @@ void setup()
 
 void loop()
 {
+  /*
   //A
   rapportCycliqueA = 50;
   rapportCycliqueB = 255;
@@ -105,6 +106,7 @@ void loop()
   rapportCycliqueC = 255;
   rapportCycliqueD = 50;
   delay(tempsTest);
+  */
   
   
   //delay(temps);
