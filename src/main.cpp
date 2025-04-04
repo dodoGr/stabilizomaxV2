@@ -11,12 +11,11 @@ void recupDonnees(void* arg)
 
   // plateau
     recupTab(tabX, tabY, lireX(),lireY());
-    afficherTableau();
+    //afficherTableauXY();
 
   //potentiometre
     recupTab(tabAC, tabBD, lireAC(),lireBD());
-    afficherBD();
-    afficherAC();
+    //afficherTableauPOT();
     
     Serial.print("\nla tache fonctionne dans l'objet recupDonnees\n");
     vTaskDelay(pdMS_TO_TICKS(temps));
@@ -28,14 +27,6 @@ void envoiDonnees(void* arg)
   while(1){
 
   //signalPWM
-
-    //pout les tests
-    cycle1 = analogRead(potTest1);
-    cycle1 = map(cycle1, 0, 4095, 0, 255);
-    cycle2 = analogRead(potTest2);
-    cycle2 = map(cycle2, 0, 4095, 0, 255);
-    //
-
     signalPWM(bobineA, rapportCycliqueA);
     signalPWM(bobineB, rapportCycliqueB);
     signalPWM(bobineC, rapportCycliqueC);
@@ -49,12 +40,20 @@ void envoiDonnees(void* arg)
 void calculDonnees(void* arg)
 {
   while(1){
-    /*
     vitesse();
+    /*  
     acceleration(); => a revoir (pas terminé)
-    */
+    */ 
+    //test_equilibrage();
 
+    calculPID();
     Serial.print("\nla tache fonctionne dans l'objet calculDonnees\n");
+    /*
+    Serial.println(rapportCycliqueA);
+    Serial.println(rapportCycliqueB);
+    Serial.println(rapportCycliqueC);
+    Serial.println(rapportCycliqueD);
+    */
     vTaskDelay(pdMS_TO_TICKS(temps));
 
   };
@@ -107,7 +106,6 @@ void loop()
   rapportCycliqueD = 50;
   delay(tempsTest);
   */
-  
   
   //delay(temps);
 

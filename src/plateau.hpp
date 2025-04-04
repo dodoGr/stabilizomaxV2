@@ -19,8 +19,8 @@ int lireX() {
     pinMode(Yup, INPUT);
     pinMode(Ylo, OUTPUT);
     digitalWrite(Ylo, HIGH);
-
-    int X = analogRead(Xri);
+    
+    X = analogRead(Xri);
     if (X < Xmin && X > 0) {
         Xmin = X;
     }
@@ -39,7 +39,7 @@ int lireY() {
     pinMode(Xle, OUTPUT);
     digitalWrite(Xle, HIGH);
 
-    int Y = analogRead(Yup);
+    Y = analogRead(Yup);
     if (Y < Ymin && Y > 0) {
         Ymin = Y;
     }
@@ -60,7 +60,7 @@ void recupTabPlateau() {
 }
 */
 
-void afficherTableau() {
+void afficherTableauXY() {
     Serial.print("Tableau X : ");
     for (int i = 0; i < TAILLE_TAB; i++) {
         Serial.print(tabX[i]);
@@ -74,27 +74,6 @@ void afficherTableau() {
         Serial.print("  ");
     }
     Serial.println();
-}
-
-void vitesse() {
-    int vitesseX = 0;
-    int vitesseY = 0;
-
-    vitesseX = (tabX[0] - tabX[1]);
-    vitesseY = (tabY[0] - tabY[1]);
-
-    for (int i = TAILLE_TAB - 1; i > 0; i--) {
-        tabVitesseX[i] = tabVitesseX[i - 1];
-        tabVitesseY[i] = tabVitesseY[i - 1];
-    }
-    Serial.print("Vitesse X = ");
-    Serial.print(vitesseX);
-    Serial.print("\tVitesse Y = ");
-    Serial.print(vitesseY);
-    Serial.print("\t en mm/");
-    Serial.print(temps/1000);
-    Serial.println("s");
-
 }
 
 void acceleration() {
