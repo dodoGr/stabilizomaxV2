@@ -11,7 +11,7 @@ void recupDonnees(void* arg)
 
   // plateau
     recupTab(tabX, tabY, lireX(),lireY());
-    //afficherTableauXY();
+    afficherTableauXY();
 
   //potentiometre
     recupTab(tabAC, tabBD, lireAC(),lireBD());

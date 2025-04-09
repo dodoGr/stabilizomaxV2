@@ -41,42 +41,39 @@ void acceleration(){
 
 // Fonction PID
 // Fonction PID complète
-float computePID(float erreur, float &erreur_prec, float &integrale, float Kp, float Ki, float Kd) {
-    float dt = 0.01; // 10 ms
-    integrale += erreur * dt;
-    float derivee = (erreur - erreur_prec) / dt;
+float computePID(float cible, float positionActuelle, float &erreur_prec, float &integrale, float Kp, float Ki, float Kd) { 
+    float erreur = cible - positionActuelle; // erreur actuelle
+    integrale += erreur * temps / 1000; // somme des erreurs 
+    float derivee = (erreur - erreur_prec)*1000 / temps;
     erreur_prec = erreur;
+
+    Serial.print("proportionnel = ");
+    Serial.print(erreur*Kd);
+    Serial.print("\tintegrale = ");
+    Serial.print(integrale*Kd);
+    Serial.print("\tderivée = ");
+    Serial.println(derivee*Kd);  
+
     return Kp * erreur + Ki * integrale + Kd * derivee;
 }
 
 // Fonction principale de calcul PID pour contrôler les 4 électroaimants
 void calculPID() {
-    // Calcul des erreurs
-    erreurX = cibleX - X;
-    erreurY = cibleY - Y;
-    erreurVitX = cibleVitX - vitesseX;
-    erreurVitY = cibleVitY - vitesseY;
-    erreurAC = cibleAC - AC;
-    erreurBD = cibleBD - BD;
 
     // PID position + vitesse pour ajuster la force à appliquer
-    float commandeX = computePID(erreurX, ancienneerreurX, integraleX, Kp_pos, Ki_pos, Kd_pos) +
-                      computePID(erreurVitX, ancienneerreurVitX, integraleVitX, Kp_vit, Ki_vit, Kd_vit);
-
-    float commandeY = computePID(erreurY, ancienneerreurY, integraleY, Kp_pos, Ki_pos, Kd_pos) +
-                      computePID(erreurVitY, ancienneerreurVitY, integraleVitY, Kp_vit, Ki_vit, Kd_vit);
-
-    float commandeAC = computePID(erreurAC, ancienneerreurAC, integraleAC, Kp_pos, Ki_pos, Kd_pos);
-    float commandeBD = computePID(erreurBD, ancienneerreurBD, integraleBD, Kp_pos, Ki_pos, Kd_pos);
+    float commandeX = computePID(cibleX, X, ancienneErreurX, integraleX, Kp_pos, Ki_pos, Kd_pos) + computePID(cibleVitX, vitesseX, ancienneerreurVitX, integraleVitX, Kp_vit, Ki_vit, Kd_vit);
+    float commandeY = computePID(cibleY, Y, ancienneErreurY, integraleY, Kp_pos, Ki_pos, Kd_pos) + computePID(cibleVitY, vitesseY, ancienneerreurVitY, integraleVitY, Kp_vit, Ki_vit, Kd_vit);
+    float commandeAC = computePID(cibleAC, AC, ancienneerreurAC, integraleAC, Kp_pos, Ki_pos, Kd_pos);
+    float commandeBD = computePID(cibleBD, BD, ancienneerreurBD, integraleBD, Kp_pos, Ki_pos, Kd_pos);
 
     // Commande totale par électroaimant (influence des 4 axes)
-    float forceA = commandeX + commandeY - commandeAC - commandeBD;
-    float forceB = -commandeX + commandeY + commandeAC - commandeBD;
-    float forceC = -commandeX - commandeY - commandeAC + commandeBD;
-    float forceD = commandeX - commandeY + commandeAC + commandeBD;
+    float forceA =   commandeX - commandeY + commandeAC*0.3;
+    float forceB = - commandeX - commandeY + commandeAC*0.3;
+    float forceC = - commandeX + commandeY + commandeBD*0.3;
+    float forceD =   commandeX + commandeY + commandeBD*0.3;    
 
     // Échelle plus douce pour atténuer la brutalité des variations
-    float facteurEchelle = 50.0;
+    float facteurEchelle = 0.50;
 
     // Conversion en PWM avec réponse plus progressive et inversée (50 = max puissance)
     rapportCycliqueA = constrain(150 - forceA * facteurEchelle, 50, 255);
@@ -84,14 +81,11 @@ void calculPID() {
     rapportCycliqueC = constrain(150 - forceC * facteurEchelle, 50, 255);
     rapportCycliqueD = constrain(150 - forceD * facteurEchelle, 50, 255);
 
-    Serial.print("Inclinaison A = ");  
-    Serial.println(rapportCycliqueA);
-    Serial.print("Inclinaison B = ");
-    Serial.println(rapportCycliqueB);
-    Serial.print("Inclinaison C = ");
-    Serial.println(rapportCycliqueC);
-    Serial.print("Inclinaison D = ");
-    Serial.println(rapportCycliqueD);
+    Serial.print("Inclinaison A = ");Serial.print(rapportCycliqueA);            Serial.print("\tforce A = ");Serial.print(forceA);      Serial.print("\tcommande X = ");Serial.println(commandeX);    
+    Serial.print("Inclinaison B = ");Serial.print(rapportCycliqueB);           Serial.print("\tforce B = ");Serial.print(forceB);       Serial.print("\tcommande Y = ");Serial.println(commandeY);                    
+    Serial.print("Inclinaison C = ");Serial.print(rapportCycliqueC);           Serial.print("\tforce C = ");Serial.print(forceC);       Serial.print("\tcommande AC = ");Serial.println(commandeAC);
+    Serial.print("Inclinaison D = ");Serial.print(rapportCycliqueD);           Serial.print("\tforce D = ");Serial.print(forceD);       Serial.print("\tcommande BD = ");Serial.println(commandeBD);
+                        
 }
 
 

@@ -10,7 +10,7 @@
 // definition du tableau
 #define TAILLE_TAB 20 
 // definition du temps
-#define temps 100 //temps en ms
+#define temps 250 //temps en ms
 
 //////////////////////////////////////////////////////////
 
@@ -56,9 +56,6 @@ volatile bool calculAcceleration = false;
 int vitesseX = 0;
 int vitesseY = 0;
 
-//position souhaitée
-int cibleX = 160;
-int cibleY = 80;
 
 //////////////////////////////////////////////////////////
 //                  Potentiometre                       //
@@ -91,9 +88,6 @@ int ACmaxmesure = 0;
 int tabAC[TAILLE_TAB] = {0};
 int tabBD[TAILLE_TAB] = {0};
 
-//inclinaison souhaitée
-int cibleAC = 0;    
-int cibleBD = 0;
 
 //////////////////////////////////////////////////////////
 //                      Bobines                         //
@@ -118,26 +112,16 @@ int rapportCycliqueD = 230;
 //                         PID                          //
 //////////////////////////////////////////////////////////
 
-float Kp_pos = 0.2, Kp_vit = 0.1; //coefficient proportionnel (un pour la position et un pour la vitesse)
-float Ki_pos = 0.01, Ki_vit = 0.005; //coefficient intégral (un pour la position et un pour la vitesse)
-float Kd_pos = 0.05, Kd_vit = 0.02; //coefficient dérivé (un pour la position et un pour la vitesse)
+float Kp_pos = 0.03, Kp_vit = 0.03; //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.001, Ki_vit = 0.0005; //coefficient intégral (précision)
+float Kd_pos = 0.03, Kd_vit = 0.03; //coefficient dérivé        (stabilité)
 
-
-float erreurX = 0; //erreur sur X (entre la valeur lu et la valeur attendue)
-float erreurY = 0; //erreur sur Y (entre la valeur lu et la valeur attendue)
-float erreurAC = 0; //erreur sur AC (entre la valeur lu et la valeur attendue)
-float erreurBD = 0; //erreur sur BD (entre la valeur lu et la valeur attendue)
-
-float erreurVitX = 0; //erreur sur la vitesse X (entre la valeur lu et la valeur attendue)
-float erreurVitY = 0; //erreur sur la vitesse Y (entre la valeur lu et la valeur attendue)
-
-float ancienneerreurX = 0; //ancienne erreur sur X 
-float ancienneerreurY = 0; //ancienne erreur sur Y 
-float ancienneerreurAC = 0; //ancienne erreur sur AC 
-float ancienneerreurBD = 0; //ancienne erreur sur BD 
-
-float ancienneerreurVitX = 0; //ancienne erreur sur la vitesse X
-float ancienneerreurVitY = 0; //ancienne erreur sur la vitesse Y
+float ancienneErreurX = 0; //erreur précédente sur X
+float ancienneErreurY = 0; //erreur précédente sur Y
+float ancienneerreurVitX = 0; //erreur précédente sur la vitesse X
+float ancienneerreurVitY = 0; //erreur précédente sur la vitesse Y
+float ancienneerreurAC = 0; //erreur précédente sur AC
+float ancienneerreurBD = 0; //erreur précédente sur BD
 
 float integraleX = 0; //erreur intégrale sur X 
 float integraleY = 0; //erreur intégrale sur Y 
@@ -146,6 +130,14 @@ float integraleBD = 0; //erreur intégrale sur BD
 
 float integraleVitX = 0; //erreur intégrale sur la vitesse X
 float integraleVitY = 0; //erreur intégrale sur la vitesse Y
+
+//position souhaitée
+int cibleX = 200;
+int cibleY = 150;
+
+//inclinaison souhaitée
+int cibleAC = 0;    
+int cibleBD = 0;
 
 float cibleVitX = 0; //vitesse cible sur X
 float cibleVitY = 0; //vitesse cible sur Y
