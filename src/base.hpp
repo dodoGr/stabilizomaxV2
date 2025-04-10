@@ -10,7 +10,7 @@
 // definition du tableau
 #define TAILLE_TAB 20 
 // definition du temps
-#define temps 250 //temps en ms
+#define temps 100 //temps en ms
 
 //////////////////////////////////////////////////////////
 
@@ -112,9 +112,9 @@ int rapportCycliqueD = 230;
 //                         PID                          //
 //////////////////////////////////////////////////////////
 
-float Kp_pos = 0.03, Kp_vit = 0.03; //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0.001, Ki_vit = 0.0005; //coefficient intégral (précision)
-float Kd_pos = 0.03, Kd_vit = 0.03; //coefficient dérivé        (stabilité)
+float Kp_pos = 0.2, Kp_vit = 0.2; //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.002, Ki_vit = 0.002; //coefficient intégral (précision)
+float Kd_pos = 0.07, Kd_vit = 0.07; //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y

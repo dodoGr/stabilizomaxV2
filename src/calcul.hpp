@@ -61,19 +61,21 @@ float computePID(float cible, float positionActuelle, float &erreur_prec, float 
 void calculPID() {
 
     // PID position + vitesse pour ajuster la force à appliquer
-    float commandeX = computePID(cibleX, X, ancienneErreurX, integraleX, Kp_pos, Ki_pos, Kd_pos) + computePID(cibleVitX, vitesseX, ancienneerreurVitX, integraleVitX, Kp_vit, Ki_vit, Kd_vit);
-    float commandeY = computePID(cibleY, Y, ancienneErreurY, integraleY, Kp_pos, Ki_pos, Kd_pos) + computePID(cibleVitY, vitesseY, ancienneerreurVitY, integraleVitY, Kp_vit, Ki_vit, Kd_vit);
+    float commandeX = computePID(cibleX, X, ancienneErreurX, integraleX, Kp_pos, Ki_pos, Kd_pos); 
+    float commandeVitX =  computePID(cibleVitX, vitesseX, ancienneerreurVitX, integraleVitX, Kp_vit, Ki_vit, Kd_vit);
+    float commandeY = computePID(cibleY, Y, ancienneErreurY, integraleY, Kp_pos, Ki_pos, Kd_pos);
+    float commandeVitY = computePID(cibleVitY, vitesseY, ancienneerreurVitY, integraleVitY, Kp_vit, Ki_vit, Kd_vit);
     float commandeAC = computePID(cibleAC, AC, ancienneerreurAC, integraleAC, Kp_pos, Ki_pos, Kd_pos);
     float commandeBD = computePID(cibleBD, BD, ancienneerreurBD, integraleBD, Kp_pos, Ki_pos, Kd_pos);
 
     // Commande totale par électroaimant (influence des 4 axes)
-    float forceA =   commandeX - commandeY + commandeAC*0.3;
-    float forceB = - commandeX - commandeY + commandeAC*0.3;
-    float forceC = - commandeX + commandeY + commandeBD*0.3;
-    float forceD =   commandeX + commandeY + commandeBD*0.3;    
+    float forceA = (  commandeX + commandeVitX - commandeY - commandeVitY - commandeBD*0.3);
+    float forceB = (  commandeX + commandeVitX + commandeY + commandeVitY + commandeAC*0.3);
+    float forceC = (- commandeX - commandeVitX + commandeY + commandeVitY + commandeBD*0.3);
+    float forceD = (- commandeX - commandeVitX - commandeY - commandeVitY - commandeAC*0.3);    
 
     // Échelle plus douce pour atténuer la brutalité des variations
-    float facteurEchelle = 0.50;
+    float facteurEchelle = 0.10;
 
     // Conversion en PWM avec réponse plus progressive et inversée (50 = max puissance)
     rapportCycliqueA = constrain(150 - forceA * facteurEchelle, 50, 255);
@@ -81,11 +83,17 @@ void calculPID() {
     rapportCycliqueC = constrain(150 - forceC * facteurEchelle, 50, 255);
     rapportCycliqueD = constrain(150 - forceD * facteurEchelle, 50, 255);
 
-    Serial.print("Inclinaison A = ");Serial.print(rapportCycliqueA);            Serial.print("\tforce A = ");Serial.print(forceA);      Serial.print("\tcommande X = ");Serial.println(commandeX);    
-    Serial.print("Inclinaison B = ");Serial.print(rapportCycliqueB);           Serial.print("\tforce B = ");Serial.print(forceB);       Serial.print("\tcommande Y = ");Serial.println(commandeY);                    
-    Serial.print("Inclinaison C = ");Serial.print(rapportCycliqueC);           Serial.print("\tforce C = ");Serial.print(forceC);       Serial.print("\tcommande AC = ");Serial.println(commandeAC);
-    Serial.print("Inclinaison D = ");Serial.print(rapportCycliqueD);           Serial.print("\tforce D = ");Serial.print(forceD);       Serial.print("\tcommande BD = ");Serial.println(commandeBD);
-                        
+    Serial.print("Inclinaison A = ");Serial.print(rapportCycliqueA);           Serial.print("\tforce A = ");Serial.println(forceA);       
+    Serial.print("Inclinaison B = ");Serial.print(rapportCycliqueB);           Serial.print("\tforce B = ");Serial.println(forceB);                        
+    Serial.print("Inclinaison C = ");Serial.print(rapportCycliqueC);           Serial.print("\tforce C = ");Serial.println(forceC);       
+    Serial.print("Inclinaison D = ");Serial.print(rapportCycliqueD);           Serial.print("\tforce D = ");Serial.println(forceD);       
+    
+    Serial.print("commande X = ");Serial.print(commandeX);    Serial.print("\tcommande AC = ");Serial.print(commandeAC);    Serial.print("\tcommande vitesse X = ");Serial.println(commandeVitX);
+    Serial.print("commande Y = ");Serial.print(commandeY);    Serial.print("\tcommande BD = ");Serial.print(commandeBD);    Serial.print("\tcommande vitesse Y = ");Serial.println(commandeVitY);
+
+   
+    
+    
 }
 
 
