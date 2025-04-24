@@ -3,15 +3,16 @@
 
 #include "base.hpp"
 
+/*
 int convertirX(int X) {
     return map(X, Xmin, Xmax, XminPlateau, XmaxPlateau);
 }
-
 int convertirY(int Y) {
     return map(Y, Ymin, Ymax, YminPlateau, YmaxPlateau);
 }
+*/ 
 
-int lireX() {
+double lireX() {
     pinMode(Xri, INPUT);
     pinMode(Xle, OUTPUT);
     digitalWrite(Xle, LOW);
@@ -27,10 +28,14 @@ int lireX() {
     if (X > Xmax) {
         Xmax = X;
     }
-    return convertirX(X);
+    Serial.print("Xmin = ");
+    Serial.print(Xmin);
+    Serial.print("\tXmax = ");
+    Serial.println(Xmax);
+    return X;
 }
 
-int lireY() {
+double lireY() {
     pinMode(Yup, INPUT);
     pinMode(Ylo, OUTPUT);
     digitalWrite(Ylo, LOW);
@@ -46,7 +51,11 @@ int lireY() {
     if (Y > Ymax) {
         Ymax = Y;
     }
-    return convertirY(Y);
+    Serial.print("Ymin = ");
+    Serial.print(Ymin);
+    Serial.print("\tYmax = ");
+    Serial.println(Ymax);
+    return Y;
 }
 
 /*

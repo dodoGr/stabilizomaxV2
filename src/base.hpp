@@ -7,10 +7,13 @@
 
 #include <Ticker.h>
 
+#include <stdio.h>
+#include <cmath>
+
 // definition du tableau
 #define TAILLE_TAB 20 
 // definition du temps
-#define temps 100 //temps en ms
+#define temps 200 //temps en ms
 
 //////////////////////////////////////////////////////////
 
@@ -37,8 +40,8 @@ void initBase(){
 #define YminPlateau 0
 #define YmaxPlateau 228
 
-int X = 0;
-int Y = 0;
+double X = 0;
+double Y = 0;
 
 int Xmin = 3000;
 int Xmax = 0;
@@ -112,9 +115,13 @@ int rapportCycliqueD = 230;
 //                         PID                          //
 //////////////////////////////////////////////////////////
 
-float Kp_pos = 0.2, Kp_vit = 0.2; //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0.002, Ki_vit = 0.002; //coefficient intégral (précision)
-float Kd_pos = 0.07, Kd_vit = 0.07; //coefficient dérivé        (stabilité)
+unsigned long tempsCalcul = millis(); // Temps écoulé depuis le démarrage de l'Arduino
+static unsigned long tempsPrecedentCalcul = 0; // Temps de la dernière mise à jour
+unsigned long ecartTemps = 0; // Écart de temps entre les calculs
+
+float Kp_pos = 1, Kp_vit = 0.2; //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.01, Ki_vit = 0.002; //coefficient intégral (précision)
+float Kd_pos = 0.5, Kd_vit = 0.07; //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y
@@ -132,8 +139,8 @@ float integraleVitX = 0; //erreur intégrale sur la vitesse X
 float integraleVitY = 0; //erreur intégrale sur la vitesse Y
 
 //position souhaitée
-int cibleX = 200;
-int cibleY = 150;
+int cibleX = 986; //1127;
+int cibleY = 476; //742;
 
 //inclinaison souhaitée
 int cibleAC = 0;    
@@ -141,6 +148,12 @@ int cibleBD = 0;
 
 float cibleVitX = 0; //vitesse cible sur X
 float cibleVitY = 0; //vitesse cible sur Y
+
+
+float forceA = 0;
+float forceB = 0;
+float forceC = 0;
+float forceD = 0;
 
 //////////////////////////////////////////////////////////
 

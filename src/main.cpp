@@ -39,21 +39,28 @@ void envoiDonnees(void* arg)
 
 void calculDonnees(void* arg)
 {
-  while(1){
-    vitesse();
-    /*  
-    acceleration(); => a revoir (pas terminé)
-    */ 
-    //test_equilibrage();
+  /*
+  PIDCoefficients pid_x_coeffs = {50, 5, 25}; // Coefficients PID pour le contrôle de la position X
+  PIDCoefficients pid_y_coeffs = {50, 5, 25}; // Coefficients PID pour le contrôle de la position Y
+  PlaqueState plaque_state = {bobineA, bobineB, bobineC, bobineD}; // État de la plaque (commandes PWM pour les actuateurs)
+  BilleState bille_state = {lireX(), lireY()}; // État de la bille (position X et Y)
+  
+  BillePlaqueController controller(pid_x_coeffs, pid_y_coeffs, temps/1000.0);
+  */
 
+  while(1){
+    //vitesse();
+    /*  
+    acceleration(); => a revoir (pas terminé
+  )
+    */ 
+   
     calculPID();
+
+    //controller.getBillePosition();
+    //controller.control(cibleX, cibleY);
+    
     Serial.print("\nla tache fonctionne dans l'objet calculDonnees\n");
-    /*
-    Serial.println(rapportCycliqueA);
-    Serial.println(rapportCycliqueB);
-    Serial.println(rapportCycliqueC);
-    Serial.println(rapportCycliqueD);
-    */
     vTaskDelay(pdMS_TO_TICKS(temps));
 
   };
