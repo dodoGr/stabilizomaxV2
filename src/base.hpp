@@ -13,7 +13,7 @@
 // definition du tableau
 #define TAILLE_TAB 20 
 // definition du temps
-#define temps 200 //temps en ms
+unsigned long tempsSynchro = 0;//temps en ms
 
 //////////////////////////////////////////////////////////
 
@@ -106,10 +106,10 @@ int tabBD[TAILLE_TAB] = {0};
 #define frequence 5000
 
 //calculés suivant le besoin
-int rapportCycliqueA = 230;
-int rapportCycliqueB = 230;
-int rapportCycliqueC = 230;
-int rapportCycliqueD = 230;
+float rapportCycliqueA = 230;
+float rapportCycliqueB = 230;
+float rapportCycliqueC = 230;
+float rapportCycliqueD = 230;
 
 //////////////////////////////////////////////////////////
 //                         PID                          //
@@ -119,9 +119,9 @@ unsigned long tempsCalcul = millis(); // Temps écoulé depuis le démarrage de 
 static unsigned long tempsPrecedentCalcul = 0; // Temps de la dernière mise à jour
 unsigned long ecartTemps = 0; // Écart de temps entre les calculs
 
-float Kp_pos = 1, Kp_vit = 0.2; //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0.01, Ki_vit = 0.002; //coefficient intégral (précision)
-float Kd_pos = 0.5, Kd_vit = 0.07; //coefficient dérivé        (stabilité)
+float Kp_pos = 10,      Kp_vit = 0.2;       //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 5,    Ki_vit = 0.002;     //coefficient intégral      (précision)
+float Kd_pos = 10,       Kd_vit = 0.07;      //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y
@@ -154,6 +154,33 @@ float forceA = 0;
 float forceB = 0;
 float forceC = 0;
 float forceD = 0;
+
+//////////////////////////////////////////////////////////
+//                    Passage à 0                       //
+//////////////////////////////////////////////////////////
+
+#define DetectionPassageZero 22
+
+bool passageZero = false; //flag pour le passage à zéro
+
+int PassageAzero(){
+    unsigned long currentTime = millis();
+    unsigned long elapsedTime;
+    //detection du front montant du passage à zéro
+    if (digitalRead(DetectionPassageZero) == HIGH && passageZero == false) {
+        passageZero = true; // Passage à zéro détecté
+        //Serial.println("Passage à zéro détecté !");
+        elapsedTime = currentTime - tempsPrecedentCalcul; // Calculer le temps écoulé
+        //Serial.print("Temps écoulé depuis le dernier passage à zéro : ");
+        //Serial.println(elapsedTime);
+        tempsPrecedentCalcul = currentTime; // Mettre à jour le temps précédent
+    } 
+    else if (digitalRead(DetectionPassageZero) == LOW) {
+      passageZero = false; // Réinitialiser le flag lorsque le signal redevient bas
+    }
+    return elapsedTime;
+}
+
 
 //////////////////////////////////////////////////////////
 

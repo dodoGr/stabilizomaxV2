@@ -45,11 +45,23 @@ float computePID(float cible, float positionActuelle, float &erreur_prec, float 
     
     /* Recuperer intervalle de temps */
     ecartTemps = tempsCalcul - tempsPrecedentCalcul; // Calculer l'écart de temps
+    float erreur = 0;
+    float derivee = 0;
+    if (X ==0 || Y == 0) { // Si la bille est en mouvement
+        //erreur = erreur;
+        //integrale = integrale;
+        //derivee = derivee;
+        erreur = 0;
+        integrale = 0;
+        derivee = 0;
+    }
+    else{
+        erreur = cible - positionActuelle; // erreur actuelle
+        integrale += erreur * ecartTemps; // somme des erreurs 
+        derivee = (erreur - erreur_prec) / ecartTemps;
+        erreur_prec = erreur;
+    }
 
-    float erreur = cible - positionActuelle; // erreur actuelle
-    integrale += erreur * ecartTemps; // somme des erreurs 
-    float derivee = (erreur - erreur_prec) / ecartTemps;
-    erreur_prec = erreur;
 
     Serial.print("proportionnel = ");
     Serial.print(erreur*Kd);
@@ -72,52 +84,58 @@ void calculPID() {
     //float commandeAC = computePID(cibleAC, AC, ancienneerreurAC, integraleAC, Kp_pos, Ki_pos, Kd_pos);
     //float commandeBD = computePID(cibleBD, BD, ancienneerreurBD, integraleBD, Kp_pos, Ki_pos, Kd_pos);
 
-
+    //coeff de proportionallité pour que X et Y aient le même poids
+    float coeff = 304/228;
     // Commande totale par électroaimant (influence des 4 axes)
+    //coté B
     if (X > cibleX && Y > cibleY){
-        forceA = (  commandeX + commandeY);
-        forceB = (  commandeX - commandeY);
-        forceC = (- commandeX + commandeY);
-        forceD = (- commandeX - commandeY);
+        forceA = (- coeff * commandeX + commandeY);
+        forceB = (- coeff * commandeX - commandeY);
+        forceC = (+ coeff * commandeX - commandeY);
+        forceD = (+ coeff * commandeX + commandeY);
     }
+    //coté D
     else if (X < cibleX && Y < cibleY){
-        forceA = (- commandeX - commandeY);
-        forceB = (- commandeX + commandeY);
-        forceC = (  commandeX - commandeY);
-        forceD = (  commandeX + commandeY);
+        forceA = (+ coeff * commandeX - commandeY);
+        forceB = (+ coeff * commandeX + commandeY);
+        forceC = (- coeff * commandeX + commandeY);
+        forceD = (- coeff * commandeX - commandeY);
     } 
+    //coté C
     else if (X > cibleX && Y < cibleY){
-        forceA = (  commandeX - commandeY);
-        forceB = (  commandeX + commandeY);
-        forceC = (- commandeX - commandeY);
-        forceD = (- commandeX + commandeY);
+        forceA = (- coeff * commandeX - commandeY);
+        forceB = (- coeff * commandeX + commandeY);
+        forceC = (+ coeff * commandeX + commandeY);
+        forceD = (+ coeff * commandeX - commandeY);
     } 
+    //coté A
     else if (X < cibleX && Y > cibleY){
-        forceA = (- commandeX + commandeY);
-        forceB = (- commandeX - commandeY);
-        forceC = (  commandeX + commandeY);
-        forceD = (  commandeX - commandeY);
+        forceA = (+ coeff * commandeX + commandeY);
+        forceB = (+ coeff * commandeX - commandeY);
+        forceC = (- coeff * commandeX - commandeY);
+        forceD = (- coeff * commandeX + commandeY);
     }
 
     // Échelle plus douce pour atténuer la brutalité des variations
-    float facteurEchelle = 0.3;
+    float facteurEchelle = 0.1;
 
     // Conversion en PWM avec réponse plus progressive et inversée (50 = max puissance)
-    rapportCycliqueA = constrain(150 - forceA * facteurEchelle, 50, 255);
-    rapportCycliqueB = constrain(150 - forceB * facteurEchelle, 50, 255);
-    rapportCycliqueC = constrain(150 - forceC * facteurEchelle, 50, 255);
-    rapportCycliqueD = constrain(150 - forceD * facteurEchelle, 50, 255);
-
-    //rapportCycliqueA = 255;
-    //rapportCycliqueB = 255;
-    //rapportCycliqueC = 255;
-    //rapportCycliqueD = 50;
+    //rapportCycliqueA = constrain(150 + forceA * facteurEchelle, 20, 255);
+    //rapportCycliqueB = constrain(150 + forceB * facteurEchelle, 20, 255);
+    //rapportCycliqueC = constrain(150 + forceC * facteurEchelle, 20, 255);
+    //rapportCycliqueD = constrain(150 + forceD * facteurEchelle, 20, 255);
+    /*
+    */
+    rapportCycliqueA = 0;
+    rapportCycliqueB = 255;
+    rapportCycliqueC = 255;
+    rapportCycliqueD = 0;
 
     Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
     Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
     Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       
     Serial.print("Signal PWM D = ");Serial.print(rapportCycliqueD);           Serial.print("\tmodif D = ");Serial.println(forceD);       
-    
+     
     Serial.print("commande X = ");Serial.println(commandeX);  
     Serial.print("commande Y = ");Serial.println(commandeY);  
 
