@@ -120,24 +120,25 @@ void calculPID() {
     float facteurEchelle = 0.1;
 
     // Conversion en PWM avec réponse plus progressive et inversée (50 = max puissance)
-    //rapportCycliqueA = constrain(150 + forceA * facteurEchelle, 20, 255);
-    //rapportCycliqueB = constrain(150 + forceB * facteurEchelle, 20, 255);
-    //rapportCycliqueC = constrain(150 + forceC * facteurEchelle, 20, 255);
-    //rapportCycliqueD = constrain(150 + forceD * facteurEchelle, 20, 255);
+    rapportCycliqueA = constrain(150 + forceA * facteurEchelle, 20, 255);
+    rapportCycliqueB = constrain(150 + forceB * facteurEchelle, 20, 255);
+    rapportCycliqueC = constrain(150 + forceC * facteurEchelle, 20, 255);
+    rapportCycliqueD = constrain(150 + forceD * facteurEchelle, 20, 255);
+    
     /*
-    */
     rapportCycliqueA = 0;
     rapportCycliqueB = 255;
     rapportCycliqueC = 255;
     rapportCycliqueD = 0;
+    */
 
-    Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
-    Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
-    Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       
-    Serial.print("Signal PWM D = ");Serial.print(rapportCycliqueD);           Serial.print("\tmodif D = ");Serial.println(forceD);       
-     
-    Serial.print("commande X = ");Serial.println(commandeX);  
-    Serial.print("commande Y = ");Serial.println(commandeY);  
+    //Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
+    //Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
+    //Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       
+    //Serial.print("Signal PWM D = ");Serial.print(rapportCycliqueD);           Serial.print("\tmodif D = ");Serial.println(forceD);       
+    // 
+    //Serial.print("commande X = ");Serial.println(commandeX);  
+    //Serial.print("commande Y = ");Serial.println(commandeY);  
 
 }
 

@@ -5,12 +5,54 @@
 
 #define tempsTest 500
 
+/*
 void Passage0(void* arg){
   while (1)
   {
     tempsSynchro = PassageAzero(); //appel de la fonction passage à zéro
   }
 }
+*/
+
+
+volatile unsigned long lastInterruptTime = 0;
+volatile unsigned long elapsedTime = 0;
+
+portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+
+unsigned long getTempsSynchro() {
+  unsigned long temp;
+  portENTER_CRITICAL(&mux);
+  temp = elapsedTime;
+  elapsedTime = 0;
+  portEXIT_CRITICAL(&mux);
+  return temp;
+}
+
+void IRAM_ATTR onZeroCrossing() {
+
+  unsigned long currentTime = millis();
+  
+  portENTER_CRITICAL_ISR(&mux);
+  tempsSynchro = currentTime - lastInterruptTime;
+  lastInterruptTime = currentTime;
+  portEXIT_CRITICAL_ISR(&mux);
+
+  //envoyer le pwm ici pour qu'il soit synchro avec le passage à zéro
+  signalPWM(bobineA, rapportCycliqueA);
+  signalPWM(bobineB, rapportCycliqueB);
+  signalPWM(bobineC, rapportCycliqueC);
+  signalPWM(bobineD, rapportCycliqueD);
+  
+  //debug
+  /*
+  Serial.println("Passage à zéro détecté !");
+  Serial.print("tempsSynchro = ");
+  Serial.println(tempsSynchro);
+  */
+}
+
+
 
 void recupDonnees(void* arg)
 {
@@ -83,9 +125,14 @@ void setup()
     tabY[i] = 0;
   }
 
-  xTaskCreate(Passage0, "MaTachePassageAZero", 4096, NULL, 5, NULL);
+  //xTaskCreate(Passage0, "MaTachePassageAZero", 4096, NULL, 5, NULL);
+  
+  pinMode(DetectionPassageZero, INPUT);
+  attachInterrupt(digitalPinToInterrupt(DetectionPassageZero), onZeroCrossing, RISING);
+
+
   //xTaskCreate(recupDonnees, "MaTacheReception", 4096, NULL, 5, NULL);
-  //xTaskCreate(envoiDonnees, "MaTacheEnvoi", 4096, NULL, 5, NULL);
+  //xTaskCreate(envoiDonnees, "MaTacheEnvoi", 4096, NULL, 5, NULL);  => du coup plus obligé de lappeler si on envoie dans le zero crossing ???
   //xTaskCreate(calculDonnees, "MaTacheCalcul", 4096, NULL, 5, NULL);
 
 }
@@ -121,8 +168,8 @@ void loop()
   rapportCycliqueD = 50;
   delay(tempsTest);
   */
-  
- delay(1000);
- Serial.println(tempsSynchro);
+
+  delay(1000);
+  Serial.println(tempsSynchro);
 
 }

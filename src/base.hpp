@@ -163,6 +163,7 @@ float forceD = 0;
 
 bool passageZero = false; //flag pour le passage à zéro
 
+/*
 int PassageAzero(){
     unsigned long currentTime = millis();
     unsigned long elapsedTime;
@@ -176,10 +177,15 @@ int PassageAzero(){
         tempsPrecedentCalcul = currentTime; // Mettre à jour le temps précédent
     } 
     else if (digitalRead(DetectionPassageZero) == LOW) {
-      passageZero = false; // Réinitialiser le flag lorsque le signal redevient bas
+        passageZero = false; // Réinitialiser le flag lorsque le signal redevient bas
     }
     return elapsedTime;
 }
+*/
+
+
+
+
 
 
 //////////////////////////////////////////////////////////
