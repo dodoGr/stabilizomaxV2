@@ -9,8 +9,8 @@ int cycle2;
 
 void signalPWM(int pin, int dutyCycle) {
     
-    pinMode(pin, OUTPUT);
     analogWrite(pin, dutyCycle);
+    //Serial.println(dutyCycle);
 
 }
 

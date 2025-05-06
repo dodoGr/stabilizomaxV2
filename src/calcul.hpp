@@ -52,7 +52,7 @@ float computePID(float cible, float positionActuelle, float &erreur_prec, float 
         //integrale = integrale;
         //derivee = derivee;
         erreur = 0;
-        integrale = 0;
+        integrale = integrale;
         derivee = 0;
     }
     else{
@@ -62,13 +62,14 @@ float computePID(float cible, float positionActuelle, float &erreur_prec, float 
         erreur_prec = erreur;
     }
 
-
+    /*
     Serial.print("proportionnel = ");
     Serial.print(erreur*Kd);
     Serial.print("\tintegrale = ");
     Serial.print(integrale*Kd);
     Serial.print("\tderivée = ");
     Serial.println(derivee*Kd);  
+    */
 
     return Kp * erreur + Ki * integrale + Kd * derivee;
 }
@@ -77,53 +78,87 @@ float computePID(float cible, float positionActuelle, float &erreur_prec, float 
 void calculPID() {
 
     // PID position + vitesse pour ajuster la force à appliquer
-    float commandeX = computePID(cibleX, X, ancienneErreurX, integraleX, Kp_pos, Ki_pos, Kd_pos); 
+    float commandeX = computePID(cibleX, lissageX, ancienneErreurX, integraleX, Kp_pos, Ki_pos, Kd_pos); 
     //float commandeVitX =  computePID(cibleVitX, vitesseX, ancienneerreurVitX, integraleVitX, Kp_vit, Ki_vit, Kd_vit);
-    float commandeY = computePID(cibleY, Y, ancienneErreurY, integraleY, Kp_pos, Ki_pos, Kd_pos);
+    float commandeY = computePID(cibleY, lissageY, ancienneErreurY, integraleY, Kp_pos, Ki_pos, Kd_pos);
     //float commandeVitY = computePID(cibleVitY, vitesseY, ancienneerreurVitY, integraleVitY, Kp_vit, Ki_vit, Kd_vit);
     //float commandeAC = computePID(cibleAC, AC, ancienneerreurAC, integraleAC, Kp_pos, Ki_pos, Kd_pos);
     //float commandeBD = computePID(cibleBD, BD, ancienneerreurBD, integraleBD, Kp_pos, Ki_pos, Kd_pos);
 
     //coeff de proportionallité pour que X et Y aient le même poids
     float coeff = 304/228;
+
+    //commande partielle sur X pour chaque électroaimant (influence des 2 axes)
+    if(lissageX > cibleX){
+        forceA = - commandeX;
+        forceB = - commandeX;
+        forceC = + commandeX;
+        forceD = + commandeX;
+    }
+    else if(lissageX < cibleX){
+        forceA = + commandeX;
+        forceB = + commandeX;
+        forceC = - commandeX;
+        forceD = - commandeX;
+    }
+    
+    /*
+    //commande partielle sur Y pour chaque électroaimant (influence des 2 axes)
+    if(lissageY > cibleY){
+        forceA = commandeY;
+        forceB = commandeY;
+        forceC = commandeY;
+        forceD = commandeY;
+    }
+    else if(lissageY < cibleY){
+        forceA = -commandeY;
+        forceB = -commandeY;
+        forceC = -commandeY;
+        forceD = -commandeY;
+    }
+    */
+
+
+    /*
     // Commande totale par électroaimant (influence des 4 axes)
     //coté B
-    if (X > cibleX && Y > cibleY){
+    if (lissageX > cibleX && lissageY > cibleY){
         forceA = (- coeff * commandeX + commandeY);
         forceB = (- coeff * commandeX - commandeY);
         forceC = (+ coeff * commandeX - commandeY);
         forceD = (+ coeff * commandeX + commandeY);
     }
     //coté D
-    else if (X < cibleX && Y < cibleY){
+    else if (lissageX < cibleX && lissageY < cibleY){
         forceA = (+ coeff * commandeX - commandeY);
         forceB = (+ coeff * commandeX + commandeY);
         forceC = (- coeff * commandeX + commandeY);
         forceD = (- coeff * commandeX - commandeY);
     } 
     //coté C
-    else if (X > cibleX && Y < cibleY){
+    else if (lissageX > cibleX && lissageY < cibleY){
         forceA = (- coeff * commandeX - commandeY);
         forceB = (- coeff * commandeX + commandeY);
         forceC = (+ coeff * commandeX + commandeY);
         forceD = (+ coeff * commandeX - commandeY);
     } 
     //coté A
-    else if (X < cibleX && Y > cibleY){
+    else if (lissageX < cibleX && lissageY > cibleY){
         forceA = (+ coeff * commandeX + commandeY);
         forceB = (+ coeff * commandeX - commandeY);
         forceC = (- coeff * commandeX - commandeY);
         forceD = (- coeff * commandeX + commandeY);
     }
-
+    */
+    
     // Échelle plus douce pour atténuer la brutalité des variations
     float facteurEchelle = 0.1;
-
-    // Conversion en PWM avec réponse plus progressive et inversée (50 = max puissance)
+    
+    // Conversion en PWM avec réponse plus progressive et inversée (20 = max puissance)
     rapportCycliqueA = constrain(150 + forceA * facteurEchelle, 20, 255);
-    rapportCycliqueB = constrain(150 + forceB * facteurEchelle, 20, 255);
-    rapportCycliqueC = constrain(150 + forceC * facteurEchelle, 20, 255);
-    rapportCycliqueD = constrain(150 + forceD * facteurEchelle, 20, 255);
+    rapportCycliqueB = constrain(150 + forceB * facteurEchelle, 40, 255);
+    rapportCycliqueC = constrain(150 + forceC * facteurEchelle, 100, 255);
+    rapportCycliqueD = constrain(150 + forceD * facteurEchelle, 100, 255);
     
     /*
     rapportCycliqueA = 0;
@@ -132,13 +167,15 @@ void calculPID() {
     rapportCycliqueD = 0;
     */
 
-    //Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
-    //Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
-    //Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       
-    //Serial.print("Signal PWM D = ");Serial.print(rapportCycliqueD);           Serial.print("\tmodif D = ");Serial.println(forceD);       
+    /*
+    Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
+    Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
+    Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       
+    Serial.print("Signal PWM D = ");Serial.print(rapportCycliqueD);           Serial.print("\tmodif D = ");Serial.println(forceD);       
     // 
-    //Serial.print("commande X = ");Serial.println(commandeX);  
-    //Serial.print("commande Y = ");Serial.println(commandeY);  
+    Serial.print("commande X = ");Serial.println(commandeX);  
+    Serial.print("commande Y = ");Serial.println(commandeY);  
+    */
 
 }
 

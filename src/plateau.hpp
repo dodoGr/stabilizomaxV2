@@ -28,10 +28,12 @@ double lireX() {
     if (X > Xmax) {
         Xmax = X;
     }
+    /*
     Serial.print("Xmin = ");
     Serial.print(Xmin);
     Serial.print("\tXmax = ");
     Serial.println(Xmax);
+    */
     return X;
 }
 
@@ -51,10 +53,12 @@ double lireY() {
     if (Y > Ymax) {
         Ymax = Y;
     }
+    /*
     Serial.print("Ymin = ");
     Serial.print(Ymin);
     Serial.print("\tYmax = ");
     Serial.println(Ymax);
+    */
     return Y;
 }
 
