@@ -5,22 +5,12 @@
 
 #define tempsTest 500
 
-/*
-void Passage0(void* arg){
-  while (1)
-  {
-    tempsSynchro = PassageAzero(); //appel de la fonction passage à zéro
-  }
-}
-*/
-
-
 volatile unsigned long lastInterruptTime = 0;
 volatile unsigned long elapsedTime = 0;
 
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 
-unsigned long getTempsSynchro() {
+unsigned long getTempsSynchro() { 
   unsigned long temp;
   portENTER_CRITICAL(&mux);
   temp = elapsedTime;
@@ -55,7 +45,6 @@ void IRAM_ATTR onZeroCrossing() {
 }
 
 
-
 void recupDonnees(void* arg)
 {
   while(1){
@@ -63,14 +52,14 @@ void recupDonnees(void* arg)
   // plateau
     recupTab(tabX, tabY, lireX(),lireY());
     lissageVal();
-    //afficherTableauXY();
+    afficherInfoXY();
 
   //potentiometre
-    recupTab(tabAC, tabBD, lireAC(),lireBD());
+    //recupTab(tabAC, tabBD, lireAC(),lireBD());
     //afficherTableauPOT();
     
     //Serial.print("\nla tache fonctionne dans l'objet recupDonnees\n");
-    vTaskDelay(pdMS_TO_TICKS(tempsSynchro));
+    vTaskDelay(pdMS_TO_TICKS(tempsSynchro/2));
   };
 }
 
@@ -99,14 +88,7 @@ void calculDonnees(void* arg)
   
   BillePlaqueController controller(pid_x_coeffs, pid_y_coeffs, temps/1000.0);
   */
-
   while(1){
-    //vitesse();
-    /*  
-    acceleration(); => a revoir (pas terminé
-  )
-    */ 
-   
     calculPID();
 
     //controller.getBillePosition();
@@ -114,7 +96,6 @@ void calculDonnees(void* arg)
     
     //Serial.print("\nla tache fonctionne dans l'objet calculDonnees\n");
     vTaskDelay(pdMS_TO_TICKS(tempsSynchro));
-
   };
 }
 
@@ -134,14 +115,15 @@ void setup()
   
   pinMode(DetectionPassageZero, INPUT);
   attachInterrupt(digitalPinToInterrupt(DetectionPassageZero), onZeroCrossing, RISING);
-
+ 
 
   xTaskCreate(recupDonnees, "MaTacheReception", 4096, NULL, 5, NULL);
   xTaskCreate(calculDonnees, "MaTacheCalcul", 4096, NULL, 5, NULL);
-  //xTaskCreate(envoiDonnees, "MaTacheEnvoi", 4096, NULL, 5, NULL);  => du coup plus obligé de lappeler si on envoie dans le zero crossing ???
+  //xTaskCreate(envoiDonnees, "MaTacheEnvoi", 4096, NULL, 5, NULL);  //=> du coup plus obligé de lappeler si on envoie dans le zero crossing ???
 
 }
 
+int dutyTest = 255;
 void loop()
 {
   /*
@@ -150,31 +132,32 @@ void loop()
   rapportCycliqueB = 255;
   rapportCycliqueC = 255;
   rapportCycliqueD = 255;
-  delay(tempsSynchro);
+  delay(tempsTest);
   
   //B
   rapportCycliqueA = 255;
   rapportCycliqueB = 50;
   rapportCycliqueC = 255;
   rapportCycliqueD = 255;
-  delay(tempsSynchro);
+  delay(tempsTest);
   
   //C
   rapportCycliqueA = 255;
   rapportCycliqueB = 255;
   rapportCycliqueC = 50;
   rapportCycliqueD = 255;
-  delay(tempsSynchro);
+  delay(tempsTest);
   
   //D
   rapportCycliqueA = 255;
   rapportCycliqueB = 255;
-  rapportCycliqueC = 255;
-  rapportCycliqueD = 50;
-  delay(tempsSynchro);
+  rapportCycliqueC = 255; 
+  rapportCycliqueD = 0;
+  delay(tempsTest);
   */
 
-  delay(1000);
   //Serial.println(tempsSynchro);
+  delay(1000);
+  
 
 }

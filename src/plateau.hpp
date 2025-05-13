@@ -28,6 +28,17 @@ double lireX() {
     if (X > Xmax) {
         Xmax = X;
     }
+
+    // On garde la dernière position pour les rebonds
+    if(X != 0){
+        sautZeroX = X;
+    }
+    // Si la bille est à zéro plus de 5 valeurs consécutives, alors c'est qu'il n'y a pas de bille sur le plateau 
+    // Sinon, on ne prend pas en compte la position actuelle
+    if(X == 0){
+        X = sautZeroX;
+    }
+
     /*
     Serial.print("Xmin = ");
     Serial.print(Xmin);
@@ -53,6 +64,16 @@ double lireY() {
     if (Y > Ymax) {
         Ymax = Y;
     }
+
+    // On garde la dernière position pour les rebonds
+    if(Y != 0){
+        sautZeroY = Y;
+    }
+    // Si la bille est à zéro, on ne prend pas en compte la position actuelle
+    if(Y == 0){
+        Y = sautZeroY;
+    }
+
     /*
     Serial.print("Ymin = ");
     Serial.print(Ymin);
@@ -62,18 +83,7 @@ double lireY() {
     return Y;
 }
 
-/*
-void recupTabPlateau() {
-    for (int i = TAILLE_TAB - 1; i > 0; i--) {
-        tabX[i] = tabX[i - 1];
-        tabY[i] = tabY[i - 1];
-    }
-    tabX[0] = lireX();
-    tabY[0] = lireY();
-}
-*/
-
-void afficherTableauXY() {
+void afficherInfoXY() {
     Serial.print("Tableau X : ");
     for (int i = 0; i < TAILLE_TAB; i++) {
         Serial.print(tabX[i]);
@@ -87,6 +97,22 @@ void afficherTableauXY() {
         Serial.print("  ");
     }
     Serial.println();
+    Serial.println("--------------------------------------------------");
+    Serial.print("Lissage X = ");
+    Serial.print(lissageX);
+    Serial.print("\tsautZeroX = ");
+    Serial.println(sautZeroX);
+    
+    Serial.print("Lissage Y = ");
+    Serial.print(lissageY);
+    Serial.print("\tsautZeroY = ");
+    Serial.println(sautZeroY);
+    Serial.println("--------------------------------------------------");
+    Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
+    Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
+    Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       
+    Serial.print("Signal PWM D = ");Serial.print(rapportCycliqueD);           Serial.print("\tmodif D = ");Serial.println(forceD);     
+    Serial.println("--------------------------------------------------");
 }
 
 void acceleration() {

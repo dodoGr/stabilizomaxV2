@@ -13,7 +13,7 @@
 // definition du tableau
 #define TAILLE_TAB 20 
 // definition du temps
-unsigned long tempsSynchro = 1000;//temps en ms
+unsigned long tempsSynchro = 500;//temps en ms
 
 //////////////////////////////////////////////////////////
 
@@ -58,6 +58,9 @@ volatile bool calculAcceleration = false;
 
 int vitesseX = 0;
 int vitesseY = 0;
+
+int sautZeroX = 0;
+int sautZeroY = 0;
 
 
 //////////////////////////////////////////////////////////
@@ -113,10 +116,10 @@ void outBobines(){
 #define frequence 5000
 
 //calculés suivant le besoin
-int rapportCycliqueA = 150;
-int rapportCycliqueB = 150;
-int rapportCycliqueC = 150;
-int rapportCycliqueD = 150;
+int rapportCycliqueA = 255;
+int rapportCycliqueB = 255;
+int rapportCycliqueC = 255;
+int rapportCycliqueD = 255;
 
 //////////////////////////////////////////////////////////
 //                         PID                          //
@@ -126,9 +129,9 @@ unsigned long tempsCalcul = millis(); // Temps écoulé depuis le démarrage de 
 static unsigned long tempsPrecedentCalcul = 0; // Temps de la dernière mise à jour
 unsigned long ecartTemps = 0; // Écart de temps entre les calculs
 
-float Kp_pos = 1,      Kp_vit = 0.2;       //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0.01,    Ki_vit = 0.002;     //coefficient intégral      (précision)
-float Kd_pos = 1,       Kd_vit = 0.07;      //coefficient dérivé        (stabilité)
+float Kp_pos = 10,      Kp_vit = 0.2;       //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.0,    Ki_vit = 0.002;     //coefficient intégral      (précision)
+float Kd_pos = 0,       Kd_vit = 0.07;      //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y
@@ -146,8 +149,8 @@ float integraleVitX = 0; //erreur intégrale sur la vitesse X
 float integraleVitY = 0; //erreur intégrale sur la vitesse Y
 
 //position souhaitée
-int cibleX = 986; //1127;
-int cibleY = 476; //742;
+int cibleX = 986; //1127;       //856
+int cibleY = 476; //742;        //391
 
 //inclinaison souhaitée
 int cibleAC = 0;    
@@ -207,15 +210,27 @@ void recupTab(int valA[], int valB[], int fonctA, int fonctB) {
 int lissageX = 0;
 int lissageY = 0;
 
-int echantillon = 5; //nombre d'échantillons à lisser
+int echantillon = 7; //nombre d'échantillons à lisser
 
 void lissageVal(){
+
+    //lissage basique
+    /*
     for (int i = 0; i < echantillon; i++) {
         lissageX += tabX[i];
         lissageY += tabY[i];
     }
-    lissageX = lissageX / echantillon;
-    lissageY = lissageY / echantillon;
+    lissageX = lissageX / (echantillon+1);
+    lissageY = lissageY / (echantillon+1);
+    */
+    
+    //lissage par filtre exponentiel
+    float alpha = 0.3; // Coefficient de lissage
+    lissageX = (1 - alpha) * lissageX + alpha * tabX[0];
+    lissageY = (1 - alpha) * lissageY + alpha * tabY[0];
+    /*
+    */
+    
     /*
     Serial.print("Lissage X = ");
     Serial.print(lissageX);

@@ -11,7 +11,7 @@ On a besoin de :
 - [x] Initialisation des broches Xri, Xle, Yup, Ylo
 - [x] récupération des positions
 - [x] Conversion des valeurs
-+ [ ] faire un filtrage ?
++ [x] faire un filtrage (lissageX et lissageY)
 
 #### Potentiomètres
 [Code Potentiometre](potentiometre.hpp)
