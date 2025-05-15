@@ -30,12 +30,26 @@ void IRAM_ATTR onZeroCrossing() {
 
   //envoyer le pwm ici pour qu'il soit synchro avec le passage à zéro/*
   /*
-  */
   signalPWM(bobineA, rapportCycliqueA);
   signalPWM(bobineB, rapportCycliqueB);
   signalPWM(bobineC, rapportCycliqueC);
   signalPWM(bobineD, rapportCycliqueD);
-  
+  */
+
+  delayA = map(rapportCycliqueA, 0, 255, 4000, 7500); 
+  delayB = map(rapportCycliqueB, 0, 255, 4000, 7500); 
+  delayC = map(rapportCycliqueC, 0, 255, 4000, 7500); 
+  delayD = map(rapportCycliqueD, 0, 255, 4000, 7500); 
+
+  esp_timer_stop(timerA);
+  esp_timer_start_once(timerA, delayA);
+  esp_timer_stop(timerB);
+  esp_timer_start_once(timerB, delayB);
+  esp_timer_stop(timerC);
+  esp_timer_start_once(timerC, delayC);
+  esp_timer_stop(timerD);
+  esp_timer_start_once(timerD, delayD);
+
   //debug
   /*
   Serial.println("Passage à zéro détecté !");
@@ -52,7 +66,7 @@ void recupDonnees(void* arg)
   // plateau
     recupTab(tabX, tabY, lireX(),lireY());
     lissageVal();
-    afficherInfoXY();
+    //afficherInfoXY();
 
   //potentiometre
     //recupTab(tabAC, tabBD, lireAC(),lireBD());
@@ -68,94 +82,92 @@ void envoiDonnees(void* arg)
   while(1){
 
   //signalPWM
-    signalPWM(bobineA, rapportCycliqueA);
-    signalPWM(bobineB, rapportCycliqueB);
-    signalPWM(bobineC, rapportCycliqueC);
-    signalPWM(bobineD, rapportCycliqueD);
+    //signalPWM(bobineA, rapportCycliqueA);
+    //signalPWM(bobineB, rapportCycliqueB);
+    //signalPWM(bobineC, rapportCycliqueC);
+    //signalPWM(bobineD, rapportCycliqueD);
+
+    esp_timer_stop(timerA);
+    esp_timer_start_once(timerA, delayA);
+    esp_timer_stop(timerB);
+    esp_timer_start_once(timerB, delayB);
+    esp_timer_stop(timerC);
+    esp_timer_start_once(timerC, delayC);
+    esp_timer_stop(timerD);
+    esp_timer_start_once(timerD, delayD);
 
     //Serial.print("\nla tache fonctionne dans l'objet envoiDonnees\n");
     vTaskDelay(pdMS_TO_TICKS(tempsSynchro));
   };
 }
 
-void calculDonnees(void* arg)
-{
-  /*
-  PIDCoefficients pid_x_coeffs = {50, 5, 25}; // Coefficients PID pour le contrôle de la position X
-  PIDCoefficients pid_y_coeffs = {50, 5, 25}; // Coefficients PID pour le contrôle de la position Y
-  PlaqueState plaque_state = {bobineA, bobineB, bobineC, bobineD}; // État de la plaque (commandes PWM pour les actuateurs)
-  BilleState bille_state = {lireX(), lireY()}; // État de la bille (position X et Y)
-  
-  BillePlaqueController controller(pid_x_coeffs, pid_y_coeffs, temps/1000.0);
-  */
+void calculDonnees(void* arg){
   while(1){
     calculPID();
 
-    //controller.getBillePosition();
-    //controller.control(cibleX, cibleY);
-    
     //Serial.print("\nla tache fonctionne dans l'objet calculDonnees\n");
     vTaskDelay(pdMS_TO_TICKS(tempsSynchro));
   };
 }
+
+
+void initTimers()
+{
+  esp_timer_create_args_t timerA_args = {
+      .callback = &envoieA,
+      .name = "TimerA",
+  };
+  esp_timer_create(&timerA_args, &timerA);
+
+  esp_timer_create_args_t timerB_args = {
+      .callback = &envoieB,
+      .name = "TimerB",
+  };
+  esp_timer_create(&timerB_args, &timerB);
+
+  esp_timer_create_args_t timerC_args = {
+      .callback = &envoieC,
+      .name = "TimerC",
+  };
+  esp_timer_create(&timerC_args, &timerC);
+
+  esp_timer_create_args_t timerD_args = {
+      .callback = &envoieD,
+      .name = "TimerD",
+  };
+  esp_timer_create(&timerD_args, &timerD);
+}
+
 
 void setup()
 {
   Serial.begin(115200);
 
   outBobines();
-
+  initTimers();
+  
   for (int i = 0; i < TAILLE_TAB; i++)
   {
     tabX[i] = 0;
     tabY[i] = 0;
   }
-
-  //xTaskCreate(Passage0, "MaTachePassageAZero", 4096, NULL, 5, NULL);
   
   pinMode(DetectionPassageZero, INPUT);
-  attachInterrupt(digitalPinToInterrupt(DetectionPassageZero), onZeroCrossing, RISING);
- 
+  attachInterrupt(digitalPinToInterrupt(DetectionPassageZero), onZeroCrossing, RISING && tempsSynchro > 2); 
 
   xTaskCreate(recupDonnees, "MaTacheReception", 4096, NULL, 5, NULL);
   xTaskCreate(calculDonnees, "MaTacheCalcul", 4096, NULL, 5, NULL);
-  //xTaskCreate(envoiDonnees, "MaTacheEnvoi", 4096, NULL, 5, NULL);  //=> du coup plus obligé de lappeler si on envoie dans le zero crossing ???
+  //xTaskCreate(envoiDonnees, "MaTacheEnvoi", 4096, NULL, 5, NULL);  //=> plus obligé de lappeler si on envoie dans le zero crossing
 
+  esp_timer_start_once(timerA, delayA);
+  esp_timer_start_once(timerB, delayB);
+  esp_timer_start_once(timerC, delayC);
+  esp_timer_start_once(timerD, delayD);
 }
 
-int dutyTest = 255;
 void loop()
 {
-  /*
-  //A
-  rapportCycliqueA = 50;
-  rapportCycliqueB = 255;
-  rapportCycliqueC = 255;
-  rapportCycliqueD = 255;
-  delay(tempsTest);
-  
-  //B
-  rapportCycliqueA = 255;
-  rapportCycliqueB = 50;
-  rapportCycliqueC = 255;
-  rapportCycliqueD = 255;
-  delay(tempsTest);
-  
-  //C
-  rapportCycliqueA = 255;
-  rapportCycliqueB = 255;
-  rapportCycliqueC = 50;
-  rapportCycliqueD = 255;
-  delay(tempsTest);
-  
-  //D
-  rapportCycliqueA = 255;
-  rapportCycliqueB = 255;
-  rapportCycliqueC = 255; 
-  rapportCycliqueD = 0;
-  delay(tempsTest);
-  */
-
+   
   //Serial.println(tempsSynchro);
   delay(1000);
   
