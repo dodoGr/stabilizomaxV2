@@ -36,11 +36,6 @@ void IRAM_ATTR onZeroCrossing() {
   signalPWM(bobineD, rapportCycliqueD);
   */
 
-  delayA = map(rapportCycliqueA, 0, 255, 4000, 7500); 
-  delayB = map(rapportCycliqueB, 0, 255, 4000, 7500); 
-  delayC = map(rapportCycliqueC, 0, 255, 4000, 7500); 
-  delayD = map(rapportCycliqueD, 0, 255, 4000, 7500); 
-
   esp_timer_stop(timerA);
   esp_timer_start_once(timerA, delayA);
   esp_timer_stop(timerB);
@@ -66,7 +61,8 @@ void recupDonnees(void* arg)
   // plateau
     recupTab(tabX, tabY, lireX(),lireY());
     lissageVal();
-    //afficherInfoXY();
+    lissageVitesse();
+    afficherInfoXY();
 
   //potentiometre
     //recupTab(tabAC, tabBD, lireAC(),lireBD());
@@ -104,12 +100,25 @@ void envoiDonnees(void* arg)
 void calculDonnees(void* arg){
   while(1){
     calculPID();
+    vitesse();
 
     //Serial.print("\nla tache fonctionne dans l'objet calculDonnees\n");
     vTaskDelay(pdMS_TO_TICKS(tempsSynchro));
   };
 }
 
+void VisuKoeffs(void* arg)
+{
+  while(1){
+    Serial.print("Kp = ");
+    Serial.print(Kp_pos);
+    Serial.print("\tKi = ");
+    Serial.print(Ki_pos);
+    Serial.print("\tKd = ");
+    Serial.println(Kd_pos);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  };
+}
 
 void initTimers()
 {
@@ -138,6 +147,28 @@ void initTimers()
   esp_timer_create(&timerD_args, &timerD);
 }
 
+void lecturePIDSerie() {
+  if (Serial.available()) {
+    String ligne = Serial.readStringUntil('\n');
+    if (ligne.startsWith("PID:")) {
+      float kp_p, ki_p, kd_p, kp_v, ki_v, kd_v, alpha_p, alpha_v;
+    int n = sscanf(ligne.c_str(), "PID:%f,%f,%f,%f,%f,%f,%f,%f", &kp_p, &ki_p, &kd_p, &kp_v, &ki_v, &kd_v, &alpha_p, &alpha_v);
+    if (n == 8) {
+      Kp_pos = constrain(kp_p, 0.0, 10.0);
+      Ki_pos = constrain(ki_p, 0.0, 1.0);
+      Kd_pos = constrain(kd_p, 0.0, 300.0);
+      Kp_vit = constrain(kp_v, 0.0, 10.0);
+      Ki_vit = constrain(ki_v, 0.0, 1.0);
+      Kd_vit = constrain(kd_v, 0.0, 300.0);
+      alpha_pos = constrain(alpha_p, 0.0, 1.0);
+      alpha_vit = constrain(alpha_v, 0.0, 1.0);
+        Serial.println("OK: PID mis à jour");
+      } else {
+        Serial.println("ERREUR: Format invalide");
+      }
+    }
+  }
+}
 
 void setup()
 {
@@ -157,6 +188,7 @@ void setup()
 
   xTaskCreate(recupDonnees, "MaTacheReception", 4096, NULL, 5, NULL);
   xTaskCreate(calculDonnees, "MaTacheCalcul", 4096, NULL, 5, NULL);
+  xTaskCreate(VisuKoeffs, "MaTacheKoeffs", 4096, NULL, 5, NULL);
   //xTaskCreate(envoiDonnees, "MaTacheEnvoi", 4096, NULL, 5, NULL);  //=> plus obligé de lappeler si on envoie dans le zero crossing
 
   esp_timer_start_once(timerA, delayA);
@@ -167,9 +199,10 @@ void setup()
 
 void loop()
 {
-   
+  lecturePIDSerie();
+
   //Serial.println(tempsSynchro);
-  delay(1000);
+  delay(10);
   
 
 }

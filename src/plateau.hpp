@@ -84,20 +84,20 @@ double lireY() {
 }
 
 void afficherInfoXY() {
-    Serial.print("Tableau X : ");
-    for (int i = 0; i < TAILLE_TAB; i++) {
-        Serial.print(tabX[i]);
-        Serial.print("  ");
-    }
-    Serial.println();
-
-    Serial.print("Tableau Y : ");
-    for (int i = 0; i < TAILLE_TAB; i++) {
-        Serial.print(tabY[i]);
-        Serial.print("  ");
-    }
-    Serial.println();
-    Serial.println("--------------------------------------------------");
+    //Serial.print("Tableau X : ");
+    //for (int i = 0; i < TAILLE_TAB; i++) {
+    //    Serial.print(tabX[i]);
+    //    Serial.print("  ");
+    //}
+    //Serial.println();
+//
+    //Serial.print("Tableau Y : ");
+    //for (int i = 0; i < TAILLE_TAB; i++) {
+    //    Serial.print(tabY[i]);
+    //    Serial.print("  ");
+    //}
+    //Serial.println();
+    //Serial.println("--------------------------------------------------");
     Serial.print("Lissage X = ");
     Serial.print(lissageX);
     Serial.print("\tsautZeroX = ");
@@ -108,11 +108,19 @@ void afficherInfoXY() {
     Serial.print("\tsautZeroY = ");
     Serial.println(sautZeroY);
     Serial.println("--------------------------------------------------");
-    Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
-    Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
-    Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       
-    Serial.print("Signal PWM D = ");Serial.print(rapportCycliqueD);           Serial.print("\tmodif D = ");Serial.println(forceD);     
-    Serial.println("--------------------------------------------------");
+    //Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
+    //Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
+    //Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       
+    //Serial.print("Signal PWM D = ");Serial.print(rapportCycliqueD);           Serial.print("\tmodif D = ");Serial.println(forceD);     
+    //Serial.println("--------------------------------------------------");
+    //Serial.print("forceA = ");Serial.print(forceA);             Serial.print("\tdelayA = ");Serial.println(delayA);
+    //Serial.print("forceB = ");Serial.print(forceB);             Serial.print("\tdelayB = ");Serial.println(delayB);
+    //Serial.print("forceC = ");Serial.print(forceC);             Serial.print("\tdelayC = ");Serial.println(delayC);
+    //Serial.print("forceD = ");Serial.print(forceD);             Serial.print("\tdelayD = ");Serial.println(delayD);
+    //Serial.println("--------------------------------------------------");
+    //Serial.print("Vitesse X = ");Serial.print(vitesseX);        Serial.print("\tVitesse Y = ");Serial.println(vitesseY);
+    //Serial.println("--------------------------------------------------");
+
 }
 
 void acceleration() {

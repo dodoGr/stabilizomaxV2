@@ -61,6 +61,7 @@ volatile bool calculAcceleration = false;
 
 int vitesseX = 0;
 int vitesseY = 0;
+int coeffVit = 0.1;
 
 int sautZeroX = 0;
 int sautZeroY = 0;
@@ -132,9 +133,9 @@ unsigned long tempsCalcul = millis(); // Temps écoulé depuis le démarrage de 
 static unsigned long tempsPrecedentCalcul = 0; // Temps de la dernière mise à jour
 unsigned long ecartTemps = 0; // Écart de temps entre les calculs
 
-float Kp_pos = 3,      Kp_vit = 0.2;       //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0,    Ki_vit = 0.002;     //coefficient intégral      (précision)
-float Kd_pos = 115,       Kd_vit = 0.07;      //coefficient dérivé        (stabilité)
+float Kp_pos = 2.4,      Kp_vit = 2.6;       //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.05,    Ki_vit = 0.05;     //coefficient intégral      (précision)
+float Kd_pos = 20,       Kd_vit = 20;      //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y
@@ -152,8 +153,8 @@ float integraleVitX = 0; //erreur intégrale sur la vitesse X
 float integraleVitY = 0; //erreur intégrale sur la vitesse Y
 
 //position souhaitée
-int cibleX =  856;      //986; //1127;       //856
-int cibleY =  391;      //476; //742;        //391
+int cibleX =  747;      //986; //1127;       //856
+int cibleY =  306;      //476; //742;        //391
 
 //inclinaison souhaitée
 int cibleAC = 0;    
@@ -163,10 +164,17 @@ float cibleVitX = 0; //vitesse cible sur X
 float cibleVitY = 0; //vitesse cible sur Y
 
 
-float forceA = 0;
-float forceB = 0;
-float forceC = 0;
-float forceD = 0;
+float forceA = 0.00;
+float forceB = 0.00;
+float forceC = 0.00;
+float forceD = 0.00;
+
+int signe(float x) {
+    return (x > 0) - (x < 0); // Renvoie +1, -1 ou 0
+}
+
+float forceAccoup = 0.5; //force d'accoup
+float seuilDistanceCentre = 100; //seuil de distance pour le passage à l'accoup
 
 //////////////////////////////////////////////////////////
 //                    Passage à 0                       //
@@ -181,10 +189,10 @@ float forceD = 0;
 esp_timer_handle_t timerA, timerB, timerC, timerD; //timer pour le passage à zéro
 
 // delay en µs
-int delayA = 7500;
-int delayB = 7500;
-int delayC = 7500;
-int delayD = 7500;
+int delayA = 5000;
+int delayB = 5000;
+int delayC = 5000;
+int delayD = 5000;
 
 //////////////////////////////////////////////////////////
 
@@ -197,31 +205,55 @@ void recupTab(int valA[], int valB[], int fonctA, int fonctB) {
     valB[0] = fonctB;
 }
 
+//////////////////////////////////////////////////////////
+//                       lissage                        //
+//////////////////////////////////////////////////////////
 
 //nos valeurs varient trop donc pas de précision, il faudrait lisser les valeurs tout en prenant en compte le deplacement de la bille
 int lissageX = 0;
 int lissageY = 0;
 
-int echantillon = 3; //nombre d'échantillons à lisser
+int echantillonPos = 7; //nombre d'échantillons à lisser
+int echantillonVit = 6; //nombre d'échantillons à lisser
+
+float alpha_pos = 0.5; // Coefficient de lissage
+float alpha_vit = 0.7; // Coefficient de lissage
 
 void lissageVal(){
 
     //lissage basique
     /*
-    */
-    for (int i = 0; i < echantillon; i++) {
+    for (int i = 0; i < echantillonPos; i++) {
         lissageX += tabX[i];
         lissageY += tabY[i];
     }
-    lissageX = lissageX / (echantillon+1);
-    lissageY = lissageY / (echantillon+1);
-    
-    /*
-    //lissage par filtre exponentiel
-    float alpha = 0.7; // Coefficient de lissage
-    lissageX = (1 - alpha) * lissageX + alpha * tabX[0];
-    lissageY = (1 - alpha) * lissageY + alpha * tabY[0];
+    lissageX = lissageX / (echantillonPos+1);
+    lissageY = lissageY / (echantillonPos+1);
     */
+    
+    //lissage par filtre exponentiel
+
+    lissageX = (1 - alpha_pos) * lissageX + alpha_pos * tabX[0];
+    lissageY = (1 - alpha_pos) * lissageY + alpha_pos * tabY[0];
+    /*
+    */
+}
+
+void lissageVitesse(){
+    /*
+    for (int i = 0; i < echantillonVit; i++) {
+        vitesseX += tabVitesseX[i];
+        vitesseY += tabVitesseY[i];
+    }
+    vitesseX = vitesseX / (echantillonVit+1);
+    vitesseY = vitesseY / (echantillonVit+1);
+    */
+
+    //lissage par filtre exponentiel
+
+    vitesseX = (1 - alpha_vit) * vitesseX + alpha_vit * tabVitesseX[0];
+    vitesseY = (1 - alpha_vit) * vitesseY + alpha_vit * tabVitesseY[0];
+
 }
 
 #endif // base_hpp
