@@ -28,6 +28,37 @@ void initBase(){
 }
 
 //////////////////////////////////////////////////////////
+//                    transmission                      //
+//////////////////////////////////////////////////////////
+
+// besoins pour transmission 
+#include <stdio.h>
+#include <string.h>
+#include "esp_random.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "nvs_flash.h"
+#include "lwip/sockets.h"
+#include "esp_log.h"
+#include "driver/gpio.h"
+#include "esp_netif.h"
+
+#define WIFI_SSID "stabilizomax"
+#define WIFI_PASS "dodoetmeo"
+#define UDP_SERVER_IP "192.168.1.100"  // Adresse du destinataire
+#define UDP_SERVER_PORT 12345
+#define UDP_LOCAL_PORT 12345
+#define LED_GPIO GPIO_NUM_2  // GPIO de la LED bleue
+
+int commandeTransmission = 0;
+
+int x_value = 0; // Variable pour stocker la valeur de x
+int y_value = 0; // Variable pour stocker la valeur de y
+
+//////////////////////////////////////////////////////////
 //                       plateau                        //
 //////////////////////////////////////////////////////////
 
@@ -98,6 +129,7 @@ int ACmaxmesure = 0;
 int tabAC[TAILLE_TAB] = {0};
 int tabBD[TAILLE_TAB] = {0};
 
+float facteurInclinaison = 0.8;
 
 //////////////////////////////////////////////////////////
 //                      Bobines                         //
@@ -125,6 +157,11 @@ int rapportCycliqueB = 0;
 int rapportCycliqueC = 0;
 int rapportCycliqueD = 0;
 
+int sliderA = 40;
+int sliderB = 80;
+int sliderC = 40;
+int sliderD = 0;
+
 //////////////////////////////////////////////////////////
 //                         PID                          //
 //////////////////////////////////////////////////////////
@@ -133,9 +170,9 @@ unsigned long tempsCalcul = millis(); // Temps écoulé depuis le démarrage de 
 static unsigned long tempsPrecedentCalcul = 0; // Temps de la dernière mise à jour
 unsigned long ecartTemps = 0; // Écart de temps entre les calculs
 
-float Kp_pos = 2.4,      Kp_vit = 2.6;       //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0.05,    Ki_vit = 0.05;     //coefficient intégral      (précision)
-float Kd_pos = 20,       Kd_vit = 20;      //coefficient dérivé        (stabilité)
+float Kp_pos = 2.06,        Kp_inclin = 0.55,          Kp_vit = 0.55;       //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.014,       Ki_inclin = 0.012,         Ki_vit = 0.012;      //coefficient intégral      (précision)
+float Kd_pos = 134.9,       Kd_inclin = 140.4,         Kd_vit = 140.4;      //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y
@@ -214,46 +251,47 @@ int lissageX = 0;
 int lissageY = 0;
 
 int echantillonPos = 7; //nombre d'échantillons à lisser
-int echantillonVit = 6; //nombre d'échantillons à lisser
+int echantillonVit = 3; //nombre d'échantillons à lisser
 
-float alpha_pos = 0.5; // Coefficient de lissage
-float alpha_vit = 0.7; // Coefficient de lissage
+float alpha_pos = 0.50; // Coefficient de lissage
+float alpha_vit = 0.50; // Coefficient de lissage
+
+bool Flag_ActivEchantPos = true; //activer le lissage de la position
+bool Flag_ActivEchantVit = true; //activer le lissage de la vitesse
 
 void lissageVal(){
 
     //lissage basique
-    /*
     for (int i = 0; i < echantillonPos; i++) {
         lissageX += tabX[i];
         lissageY += tabY[i];
     }
     lissageX = lissageX / (echantillonPos+1);
     lissageY = lissageY / (echantillonPos+1);
-    */
-    
-    //lissage par filtre exponentiel
 
+}
+
+void filtreExpPosition(){
+    //lissage par filtre exponentiel
     lissageX = (1 - alpha_pos) * lissageX + alpha_pos * tabX[0];
     lissageY = (1 - alpha_pos) * lissageY + alpha_pos * tabY[0];
-    /*
-    */
 }
 
 void lissageVitesse(){
-    /*
+
     for (int i = 0; i < echantillonVit; i++) {
         vitesseX += tabVitesseX[i];
         vitesseY += tabVitesseY[i];
     }
     vitesseX = vitesseX / (echantillonVit+1);
     vitesseY = vitesseY / (echantillonVit+1);
-    */
+    
+}
 
+void filtreExpVitesse(){
     //lissage par filtre exponentiel
-
     vitesseX = (1 - alpha_vit) * vitesseX + alpha_vit * tabVitesseX[0];
     vitesseY = (1 - alpha_vit) * vitesseY + alpha_vit * tabVitesseY[0];
-
 }
 
 #endif // base_hpp

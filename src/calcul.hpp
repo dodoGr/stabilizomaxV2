@@ -73,8 +73,8 @@ void calculPID() {
     float commandeVitX =  computePID(cibleVitX, vitesseX, ancienneerreurVitX, integraleVitX, Kp_vit, Ki_vit, Kd_vit);
     float commandeVitY = computePID(cibleVitY, vitesseY, ancienneerreurVitY, integraleVitY, Kp_vit, Ki_vit, Kd_vit);
     
-    //float commandeAC = computePID(cibleAC, AC, ancienneerreurAC, integraleAC, Kp_pos, Ki_pos, Kd_pos);
-    //float commandeBD = computePID(cibleBD, BD, ancienneerreurBD, integraleBD, Kp_pos, Ki_pos, Kd_pos);
+    float commandeAC = computePID(cibleAC, AC, ancienneerreurAC, integraleAC, Kp_inclin, Ki_inclin, Kd_inclin);
+    float commandeBD = computePID(cibleBD, BD, ancienneerreurBD, integraleBD, Kp_inclin, Ki_inclin, Kd_inclin);
 
     //coeff de proportionallité pour que X et Y aient le même poids
     float coeff = 304/228;
@@ -95,30 +95,40 @@ void calculPID() {
     forceD = + commandeY;
     */
 
+   /*
     //influence des bobines suivant X et Y
     forceA = - commandeX + coeff * commandeY;
     forceB = - commandeX - coeff * commandeY;
     forceC = + commandeX - coeff * commandeY;
     forceD = + commandeX + coeff * commandeY;
-    /*
-    */
-
-    if (distanceCentre > cibleX+seuilDistanceCentre || distanceCentre < cibleX-seuilDistanceCentre || distanceCentre > cibleY+seuilDistanceCentre || distanceCentre < cibleY-seuilDistanceCentre) {
-    }
     
     //ajout de la vitesse
-    forceA = forceA + (+ coeffVit * commandeVitX - coeffVit * commandeVitY);
-    forceB = forceB + (+ coeffVit * commandeVitX + coeffVit * commandeVitY);
-    forceC = forceC + (- coeffVit * commandeVitX + coeffVit * commandeVitY);
-    forceD = forceD + (- coeffVit * commandeVitX - coeffVit * commandeVitY);
-  
+    forceA = forceA - (+ coeffVit * commandeVitX - coeff * coeffVit * commandeVitY);
+    forceB = forceB - (+ coeffVit * commandeVitX + coeff * coeffVit * commandeVitY);
+    forceC = forceC - (- coeffVit * commandeVitX + coeff * coeffVit * commandeVitY);
+    forceD = forceD - (- coeffVit * commandeVitX - coeff * coeffVit * commandeVitY);
+    
+    //ajout de l'inclinaison
+    forceA = forceA + (- commandeAC - commandeBD) * facteurInclinaison;
+    forceB = forceB + (- commandeAC - commandeBD) * facteurInclinaison;
+    forceC = forceC + (- commandeAC - commandeBD) * facteurInclinaison;
+    forceD = forceD + (- commandeAC - commandeBD) * facteurInclinaison;
+    */
+    
+    /*                  position                                            vitesse                                                 inclinaison                 */
+    forceA = (- commandeX + coeff * commandeY) - (+ coeffVit * commandeVitX - coeff * coeffVit * commandeVitY) + (- commandeAC - commandeBD) * facteurInclinaison;
+    forceB = (- commandeX - coeff * commandeY) - (+ coeffVit * commandeVitX + coeff * coeffVit * commandeVitY) + (- commandeAC - commandeBD) * facteurInclinaison;
+    forceC = (+ commandeX - coeff * commandeY) - (- coeffVit * commandeVitX + coeff * coeffVit * commandeVitY) + (- commandeAC - commandeBD) * facteurInclinaison;
+    forceD = (+ commandeX + coeff * commandeY) - (- coeffVit * commandeVitX - coeff * coeffVit * commandeVitY) + (- commandeAC - commandeBD) * facteurInclinaison;
+
+
     // Échelle plus douce pour atténuer la brutalité des variations
     float facteurEchelle = 0.8;
     
-    delayA = constrain(6000 - forceA * facteurEchelle, 4000, 7500);
-    delayB = constrain(6000 - forceB * facteurEchelle, 4000, 7500);
-    delayC = constrain(6000 - forceC * facteurEchelle, 4000, 7500);
-    delayD = constrain(6000 - forceD * facteurEchelle, 4000, 7500);
+    delayA = constrain(6000 - forceA * facteurEchelle, 4000, 7500) - sliderA;
+    delayB = constrain(6000 - forceB * facteurEchelle, 4000, 7500) - sliderB;
+    delayC = constrain(6000 - forceC * facteurEchelle, 4000, 7500) - sliderC;
+    delayD = constrain(6000 - forceD * facteurEchelle, 4000, 7500) - sliderD;
 
 }
 
