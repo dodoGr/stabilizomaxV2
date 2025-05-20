@@ -87,12 +87,9 @@ int tabY[TAILLE_TAB] = {0};
 int tabVitesseX[TAILLE_TAB] = {0};
 int tabVitesseY[TAILLE_TAB] = {0};
 
-volatile bool calculVitesse = false;
-volatile bool calculAcceleration = false;
-
 int vitesseX = 0;
 int vitesseY = 0;
-int coeffVit = 0.1;
+float coeffVit = 0.1;
 
 int sautZeroX = 0;
 int sautZeroY = 0;
@@ -151,15 +148,9 @@ void outBobines(){
 
 #define frequence 5000
 
-//calculés suivant le besoin
-int rapportCycliqueA = 0;
-int rapportCycliqueB = 0;
-int rapportCycliqueC = 0;
-int rapportCycliqueD = 0;
-
-int sliderA = 40;
-int sliderB = 80;
-int sliderC = 40;
+int sliderA = 10;
+int sliderB = 310;
+int sliderC = 30;
 int sliderD = 0;
 
 //////////////////////////////////////////////////////////
@@ -170,9 +161,9 @@ unsigned long tempsCalcul = millis(); // Temps écoulé depuis le démarrage de 
 static unsigned long tempsPrecedentCalcul = 0; // Temps de la dernière mise à jour
 unsigned long ecartTemps = 0; // Écart de temps entre les calculs
 
-float Kp_pos = 2.06,        Kp_inclin = 0.55,          Kp_vit = 0.55;       //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0.014,       Ki_inclin = 0.012,         Ki_vit = 0.012;      //coefficient intégral      (précision)
-float Kd_pos = 134.9,       Kd_inclin = 140.4,         Kd_vit = 140.4;      //coefficient dérivé        (stabilité)
+float Kp_pos = 1.93,        Kp_inclin = 1.15,          Kp_vit = 0.94;       //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.010,       Ki_inclin = 0.012,         Ki_vit = 0.005;      //coefficient intégral      (précision)
+float Kd_pos = 106.0,       Kd_inclin = 101.8,         Kd_vit = 85.3;      //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y
@@ -185,7 +176,6 @@ float integraleX = 0; //erreur intégrale sur X
 float integraleY = 0; //erreur intégrale sur Y 
 float integraleAC = 0; //erreur intégrale sur AC 
 float integraleBD = 0; //erreur intégrale sur BD 
-
 float integraleVitX = 0; //erreur intégrale sur la vitesse X
 float integraleVitY = 0; //erreur intégrale sur la vitesse Y
 
