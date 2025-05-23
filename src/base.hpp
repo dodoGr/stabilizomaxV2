@@ -48,7 +48,7 @@ void initBase(){
 
 #define WIFI_SSID "stabilizomax"
 #define WIFI_PASS "dodoetmeo"
-#define UDP_SERVER_IP "192.168.1.100"  // Adresse du destinataire
+#define UDP_SERVER_IP "192.168.1.106"  // Adresse du destinataire
 #define UDP_SERVER_PORT 12345
 #define UDP_LOCAL_PORT 12345
 #define LED_GPIO GPIO_NUM_2  // GPIO de la LED bleue
@@ -57,6 +57,21 @@ int commandeTransmission = 0;
 
 int x_value = 0; // Variable pour stocker la valeur de x
 int y_value = 0; // Variable pour stocker la valeur de y
+
+/*
+     _______________100.100
+    |               |
+    |               |
+    |_______________|  
+  0.0
+*/
+
+//800x800 px => affichage sur l'interface back-end 
+float coeffDeProportionX = 0.08;
+float coeffDeProportionY = 0.18;
+
+int randomX = 0;
+int randomY = 0;
 
 //////////////////////////////////////////////////////////
 //                       plateau                        //
@@ -94,6 +109,24 @@ float coeffVit = 0.1;
 int sautZeroX = 0;
 int sautZeroY = 0;
 
+//////////////////////////////////////////////////////////
+//                 correction plateau                   //
+//////////////////////////////////////////////////////////
+
+float valXmax = 1465;
+float valYmax = 734;
+
+float pourcentX = 0;
+float pourcentY = 0;
+
+float facteurPoucrentX = 0;
+float facteurPoucrentY = 0;
+
+float facteurCorrectionX = 1.23;
+float facteurCorrectionY = 1.60;
+
+int maxPlateauX = 1222;
+int maxPlateauY = 562;
 
 //////////////////////////////////////////////////////////
 //                  Potentiometre                       //
@@ -148,9 +181,9 @@ void outBobines(){
 
 #define frequence 5000
 
-int sliderA = 10;
-int sliderB = 310;
-int sliderC = 30;
+int sliderA = 0;
+int sliderB = 150;
+int sliderC = 0;
 int sliderD = 0;
 
 //////////////////////////////////////////////////////////
@@ -161,9 +194,9 @@ unsigned long tempsCalcul = millis(); // Temps écoulé depuis le démarrage de 
 static unsigned long tempsPrecedentCalcul = 0; // Temps de la dernière mise à jour
 unsigned long ecartTemps = 0; // Écart de temps entre les calculs
 
-float Kp_pos = 1.93,        Kp_inclin = 1.15,          Kp_vit = 0.94;       //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0.010,       Ki_inclin = 0.012,         Ki_vit = 0.005;      //coefficient intégral      (précision)
-float Kd_pos = 106.0,       Kd_inclin = 101.8,         Kd_vit = 85.3;      //coefficient dérivé        (stabilité)
+float Kp_pos = 1.97,        Kp_inclin = 1.01,          Kp_vit = 1.06;       //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.014,       Ki_inclin = 0.007,         Ki_vit = 0.013;      //coefficient intégral      (précision)
+float Kd_pos = 89.4,       Kd_inclin = 85.3,         Kd_vit = 140.4;      //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y
@@ -180,8 +213,8 @@ float integraleVitX = 0; //erreur intégrale sur la vitesse X
 float integraleVitY = 0; //erreur intégrale sur la vitesse Y
 
 //position souhaitée
-int cibleX =  747;      //986; //1127;       //856
-int cibleY =  306;      //476; //742;        //391
+int cibleX =  745;      //747;      //986;      //1127;       //856
+int cibleY =  242;      //306;      //476;      //742;        //391
 
 //inclinaison souhaitée
 int cibleAC = 0;    
@@ -240,7 +273,7 @@ void recupTab(int valA[], int valB[], int fonctA, int fonctB) {
 int lissageX = 0;
 int lissageY = 0;
 
-int echantillonPos = 7; //nombre d'échantillons à lisser
+int echantillonPos = 6; //nombre d'échantillons à lisser
 int echantillonVit = 3; //nombre d'échantillons à lisser
 
 float alpha_pos = 0.50; // Coefficient de lissage

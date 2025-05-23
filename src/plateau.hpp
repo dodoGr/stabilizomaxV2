@@ -29,6 +29,8 @@ double lireX() {
         Xmax = X;
     }
 
+    X = constrain(X, 0, maxPlateauX);
+
     // On garde la dernière position pour les rebonds
     if(X != 0){
         sautZeroX = X;
@@ -65,6 +67,8 @@ double lireY() {
         Ymax = Y;
     }
 
+    Y = constrain(Y, 0, maxPlateauY);
+
     // On garde la dernière position pour les rebonds
     if(Y != 0){
         sautZeroY = Y;
@@ -84,30 +88,30 @@ double lireY() {
 }
 
 void afficherInfoXY() {
-    //Serial.print("Tableau X : ");
-    //for (int i = 0; i < TAILLE_TAB; i++) {
-    //    Serial.print(tabX[i]);
-    //    Serial.print("  ");
-    //}
-    //Serial.println();
+    Serial.print("Tableau X : ");
+    for (int i = 0; i < TAILLE_TAB; i++) {
+        Serial.print(tabX[i]);
+        Serial.print("  ");
+    }
+    Serial.println();
 //
-    //Serial.print("Tableau Y : ");
-    //for (int i = 0; i < TAILLE_TAB; i++) {
-    //    Serial.print(tabY[i]);
-    //    Serial.print("  ");
-    //}
-    //Serial.println();
-    //Serial.println("--------------------------------------------------");
-    Serial.print("Lissage X = ");
-    Serial.print(lissageX);
-    Serial.print("\tsautZeroX = ");
-    Serial.println(sautZeroX);
-    
-    Serial.print("Lissage Y = ");
-    Serial.print(lissageY);
-    Serial.print("\tsautZeroY = ");
-    Serial.println(sautZeroY);
+    Serial.print("Tableau Y : ");
+    for (int i = 0; i < TAILLE_TAB; i++) {
+        Serial.print(tabY[i]);
+        Serial.print("  ");
+    }
+    Serial.println();
     Serial.println("--------------------------------------------------");
+    //Serial.print("Lissage X = ");
+    //Serial.print(lissageX);
+    //Serial.print("\tsautZeroX = ");
+    //Serial.println(sautZeroX);
+    //
+    //Serial.print("Lissage Y = ");
+    //Serial.print(lissageY);
+    //Serial.print("\tsautZeroY = ");
+    //Serial.println(sautZeroY);
+    //Serial.println("--------------------------------------------------");
     //Serial.print("Signal PWM A = ");Serial.print(rapportCycliqueA);           Serial.print("\tmodif A = ");Serial.println(forceA);       
     //Serial.print("Signal PWM B = ");Serial.print(rapportCycliqueB);           Serial.print("\tmodif B = ");Serial.println(forceB);                        
     //Serial.print("Signal PWM C = ");Serial.print(rapportCycliqueC);           Serial.print("\tmodif C = ");Serial.println(forceC);       

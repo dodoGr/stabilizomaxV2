@@ -198,8 +198,11 @@ void udp_client_task(void *pvParameters) {
 
 
 while (1) {
-    int randomX = esp_random() % 100; // Nombre aléatoire entre 0 et 99
-    int randomY = esp_random() % 100;
+
+    randomX = lissageX * coeffDeProportionX;
+    randomY = lissageY * coeffDeProportionY;
+
+    randomY =  - randomY + 100;
 
     char positionX[10];  // Buffer pour stocker x 
     char positionY[10];  // Buffer pour stocker y
@@ -209,20 +212,20 @@ while (1) {
 
     // Envoi de X
     sendto(sock, positionX, strlen(positionX), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    printf("Message envoyé : %s à : %s\n", positionX, inet_ntoa(server_addr.sin_addr));
-    printf("\n");
+    //printf("Message envoyé : %s à : %s\n", positionX, inet_ntoa(server_addr.sin_addr));
+    //printf("\n");
     vTaskDelay(pdMS_TO_TICKS(500));
 
     // Envoi de Y
     sendto(sock, positionY, strlen(positionY), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    printf("Message envoyé : %s\n", positionY);
-    printf("\n");
+    //printf("Message envoyé : %s\n", positionY);
+    //printf("\n");
+//
+    //printf("valeur de x recu : %d\n", x_value);
+    //printf("valeur de y recu : %d\n", y_value);
+    //printf("etat de la commandeTransmission : %d\n", commandeTransmission);
 
-    printf("valeur de x recu : %d\n", x_value);
-    printf("valeur de y recu : %d\n", y_value);
-    printf("etat de la commandeTransmission : %d\n", commandeTransmission);
-
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(8));
 }
 
 

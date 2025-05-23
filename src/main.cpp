@@ -29,14 +29,6 @@ void IRAM_ATTR onZeroCrossing() {
   lastInterruptTime = currentTime;
   portEXIT_CRITICAL_ISR(&mux);
 
-  //envoyer le pwm ici pour qu'il soit synchro avec le passage à zéro/*
-  /*
-  signalPWM(bobineA, rapportCycliqueA);
-  signalPWM(bobineB, rapportCycliqueB);
-  signalPWM(bobineC, rapportCycliqueC);
-  signalPWM(bobineD, rapportCycliqueD);
-  */
-
   esp_timer_stop(timerA);
   esp_timer_start_once(timerA, delayA);
   esp_timer_stop(timerB);
@@ -58,25 +50,19 @@ void IRAM_ATTR onZeroCrossing() {
 void recupDonnees(void* arg)
 {
   while(1){
-
   // plateau
     recupTab(tabX, tabY, lireX(),lireY());
-
-
+    //correctionPlateu();
     if(Flag_ActivEchantPos){
       lissageVal();}
     if(Flag_ActivEchantVit){
       lissageVitesse();}
-
     filtreExpPosition();
     filtreExpVitesse();
     //afficherInfoXY();
-
   //potentiometre
     recupTab(tabAC, tabBD, lireAC(),lireBD());
     //afficherTableauPOT();
-    
-    //Serial.print("\nla tache fonctionne dans l'objet recupDonnees\n");
     vTaskDelay(pdMS_TO_TICKS(4));
   };
 }
@@ -109,8 +95,6 @@ void calculDonnees(void* arg){
   while(1){
     calculPID();
     vitesse();
-
-    //Serial.print("\nla tache fonctionne dans l'objet calculDonnees\n");
     vTaskDelay(pdMS_TO_TICKS(8));
   };
 }

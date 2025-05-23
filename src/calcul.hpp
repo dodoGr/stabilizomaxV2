@@ -3,6 +3,21 @@
 
 #include "base.hpp"
 
+void correctionPlateu(){
+    pourcentX = tabX[0] * (100 / valXmax);
+    pourcentY = tabY[0] * (100 / valYmax);
+    if ((pourcentX + pourcentY) > 100) {
+        facteurPoucrentX = (100 - pourcentX);
+        facteurPoucrentY = (100 - pourcentY);
+
+        pourcentX = pourcentX + pourcentX * (facteurPoucrentX / 100);
+        pourcentY = pourcentY + pourcentY * (facteurPoucrentY / 100);
+
+        tabX[0] = valXmax * (pourcentX /100);
+        tabY[0] = valYmax * (pourcentY /100);
+    }
+}
+
 void vitesse(){
  
     vitesseX = (tabX[0] - tabX[1]) / 0.008;
