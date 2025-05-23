@@ -182,7 +182,7 @@ void outBobines(){
 #define frequence 5000
 
 int sliderA = 0;
-int sliderB = 150;
+int sliderB = 330;
 int sliderC = 0;
 int sliderD = 0;
 
@@ -194,9 +194,9 @@ unsigned long tempsCalcul = millis(); // Temps écoulé depuis le démarrage de 
 static unsigned long tempsPrecedentCalcul = 0; // Temps de la dernière mise à jour
 unsigned long ecartTemps = 0; // Écart de temps entre les calculs
 
-float Kp_pos = 1.97,        Kp_inclin = 1.01,          Kp_vit = 1.06;       //coefficient proportionnel (vitesse de réponse)
-float Ki_pos = 0.014,       Ki_inclin = 0.007,         Ki_vit = 0.013;      //coefficient intégral      (précision)
-float Kd_pos = 89.4,       Kd_inclin = 85.3,         Kd_vit = 140.4;      //coefficient dérivé        (stabilité)
+float Kp_pos = 2.00,           Kp_vit = 1.24,        Kp_inclin = 1.01;       //coefficient proportionnel (vitesse de réponse)
+float Ki_pos = 0.014,          Ki_vit = 0.013,       Ki_inclin = 0.007;      //coefficient intégral      (précision)
+float Kd_pos = 89.4,           Kd_vit = 140.6,       Kd_inclin = 85.3;       //coefficient dérivé        (stabilité)
 
 float ancienneErreurX = 0; //erreur précédente sur X
 float ancienneErreurY = 0; //erreur précédente sur Y
